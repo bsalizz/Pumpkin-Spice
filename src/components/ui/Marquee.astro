@@ -1,0 +1,77 @@
+---
+interface Props {
+  items: readonly string[];
+}
+
+const { items } = Astro.props;
+const rows = [
+  { reverse: false, outline: false },
+  { reverse: true, outline: true },
+] as const;
+---
+
+<div class="marquee" aria-hidden="true" data-scene="marquee">
+  {rows.map((row) => (
+    <div
+      class:list={['marquee__row', { 'marquee__row--outline': row.outline }]}
+      data-marquee={row.reverse ? '-1' : '1'}
+    >
+      {[0, 1].map(() => (
+        <div class="marquee__group display">
+          {items.map((item) => (
+            <span class="marquee__item">
+              {item}
+              <span class="marquee__star gold">✦</span>
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
+
+<style>
+  .marquee {
+    position: relative;
+    z-index: var(--z-content);
+    display: grid;
+    gap: 0.4rem;
+    padding-block: clamp(3rem, 8vw, 7rem);
+    overflow: clip;
+    transform: rotate(-3deg) scale(1.05);
+  }
+
+  .marquee__row {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .marquee__group {
+    display: flex;
+    flex-shrink: 0;
+    font-size: clamp(3.4rem, 1.5rem + 8vw, 10rem);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding-right: 0.35em;
+  }
+
+  .marquee__star {
+    font-size: 0.4em;
+  }
+
+  .marquee__row--outline .marquee__item {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--c-cream);
+  }
+
+  .marquee__row--outline .marquee__star {
+    -webkit-text-stroke: 0;
+  }
+</style>

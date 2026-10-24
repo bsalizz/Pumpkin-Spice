@@ -1,0 +1,226 @@
+---
+import { SITE } from '../../config/site.ts';
+import type { Dictionary } from '../../i18n/types.ts';
+import Emblem from '../ui/Emblem.astro';
+
+interface Props {
+  dict: Dictionary;
+  locale: string;
+}
+
+const { dict, locale } = Astro.props;
+const { reserve } = dict;
+const price = new Intl.NumberFormat(locale, {
+  style: 'currency',
+  currency: SITE.price.currency,
+  maximumFractionDigits: 0,
+}).format(Number(SITE.price.amount));
+const ring = `${SITE.product} · ${SITE.edition} · ${SITE.brand} · `;
+const units = ['d', 'h', 'm', 's'] as const;
+---
+
+<section class="reserve section" id="reserve" data-scene="reserve" aria-labelledby="reserve-title">
+  <div class="reserve__seal" aria-hidden="true">
+    <svg class="reserve__ring" viewBox="0 0 200 200" data-spin>
+      <defs>
+        <path id="seal-ring" d="M100 100m-82 0a82 82 0 1 1 164 0a82 82 0 1 1-164 0"></path>
+      </defs>
+      <text class="mono">
+        <textPath href="#seal-ring" textLength="512">
+          {ring.repeat(2)}
+        </textPath>
+      </text>
+    </svg>
+    <Emblem class="reserve__emblem" />
+  </div>
+
+  <p class="label mono" data-reveal>
+    {reserve.label}
+  </p>
+  <h2 class="reserve__title display" id="reserve-title">
+    <span class="split-line">
+      <span data-split="chars" data-reveal-chars>
+        {reserve.title}
+      </span>
+    </span>
+  </h2>
+  <p class="reserve__text serif-italic" data-reveal>
+    {reserve.text}
+  </p>
+
+  <div class="reserve__meta" data-reveal>
+    <p class="reserve__price">
+      <span class="mono">{reserve.priceLabel}</span>
+      <span class="display gold">{price}</span>
+    </p>
+
+    <div class="reserve__countdown" data-countdown>
+      <p class="mono">{reserve.countdownLabel}</p>
+      <ol class="countdown">
+        {units.map((unit) => (
+          <li>
+            <span class="countdown__value display" data-unit={unit}>
+              00
+            </span>
+            <span class="countdown__unit mono">{reserve.units[unit]}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+
+  <button
+    class="reserve__cta mono"
+    type="button"
+    data-share
+    data-magnetic
+    data-share-text={reserve.shareText}
+    data-shared-label={reserve.shared}
+  >
+    <span class="reserve__cta-label" data-share-label>
+      {reserve.share}
+    </span>
+    <span class="reserve__cta-arrow" aria-hidden="true">
+      →
+    </span>
+  </button>
+  <p class="visually-hidden" role="status" aria-live="polite" data-share-status></p>
+</section>
+
+<style>
+  .reserve {
+    display: grid;
+    justify-items: center;
+    gap: 1.6rem;
+    text-align: center;
+  }
+
+  .reserve__seal {
+    position: relative;
+    width: clamp(9rem, 22vw, 13rem);
+    aspect-ratio: 1;
+    margin-bottom: 1rem;
+    color: var(--c-gold);
+  }
+
+  .reserve__ring {
+    position: absolute;
+    inset: 0;
+    fill: currentColor;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+  }
+
+  .reserve__seal :global(.reserve__emblem) {
+    position: absolute;
+    inset: 24%;
+  }
+
+  .reserve__title {
+    font-size: clamp(3.4rem, 1.2rem + 9vw, 11rem);
+    max-width: 12ch;
+    line-height: 0.86;
+  }
+
+  .reserve__text {
+    max-width: 26ch;
+    font-size: var(--fs-lead);
+    line-height: 1.05;
+    color: var(--c-cream-dim);
+  }
+
+  .reserve__meta {
+    display: grid;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 44rem;
+    padding-block: 2rem;
+    border-block: 1px solid var(--c-cream-faint);
+  }
+
+  .reserve__price {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .reserve__price .display {
+    font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+
+  .reserve__countdown {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .countdown li {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .countdown__value {
+    font-size: clamp(2.4rem, 1.6rem + 3vw, 4.2rem);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .countdown__unit {
+    color: var(--c-cream-dim);
+  }
+
+  .reserve__cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.3rem 2.2rem;
+    border: 1px solid var(--c-gold);
+    border-radius: 999px;
+    overflow: hidden;
+    color: var(--c-cream);
+    isolation: isolate;
+    transition: color 0.6s var(--ease-out);
+  }
+
+  .reserve__cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--c-gold);
+    transform: translateY(101%);
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .reserve__cta:hover,
+  .reserve__cta:focus-visible {
+    color: var(--c-ink);
+  }
+
+  .reserve__cta:hover::before,
+  .reserve__cta:focus-visible::before {
+    transform: none;
+  }
+
+  .reserve__cta-arrow {
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .reserve__cta:hover .reserve__cta-arrow {
+    transform: translateX(0.4rem);
+  }
+
+  @media (min-width: 700px) {
+    .reserve__meta {
+      grid-template-columns: auto 1fr;
+      align-items: end;
+      text-align: left;
+    }
+  }
+</style>

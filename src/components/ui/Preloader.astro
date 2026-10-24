@@ -1,0 +1,86 @@
+---
+import Emblem from './Emblem.astro';
+
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<div class="preloader" data-preloader aria-hidden="true">
+  <div class="preloader__panel preloader__panel--top"></div>
+  <div class="preloader__panel preloader__panel--bottom"></div>
+  <div class="preloader__inner">
+    <Emblem class="preloader__emblem" />
+    <p class="preloader__count display" data-preloader-count>
+      000
+    </p>
+    <p class="preloader__label mono">{label}</p>
+  </div>
+</div>
+
+<style>
+  .preloader {
+    display: none;
+  }
+
+  :global(.js) .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-preloader);
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  .preloader__panel {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50.5%;
+    background: var(--c-ink);
+  }
+
+  .preloader__panel--top {
+    top: 0;
+  }
+
+  .preloader__panel--bottom {
+    bottom: 0;
+  }
+
+  .preloader__inner {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.2rem;
+    color: var(--c-gold);
+  }
+
+  .preloader__inner :global(.preloader__emblem) {
+    width: clamp(4.5rem, 12vw, 7rem);
+  }
+
+  .preloader__inner :global(.preloader__emblem *) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: preloader-draw 1.4s var(--ease-out) forwards;
+  }
+
+  .preloader__count {
+    font-size: clamp(3rem, 10vw, 6rem);
+    color: var(--c-cream);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .preloader__label {
+    color: var(--c-cream-dim);
+  }
+
+  @keyframes preloader-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

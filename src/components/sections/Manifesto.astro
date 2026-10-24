@@ -1,0 +1,31 @@
+---
+import type { Dictionary } from '../../i18n/types.ts';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { manifesto } = Astro.props.dict;
+---
+
+<section class="manifesto section" id="manifesto" data-scene="manifesto" aria-label={manifesto}>
+  <p class="manifesto__text serif-italic" data-split="words" data-scrub-words>
+    {manifesto}
+  </p>
+</section>
+
+<style>
+  .manifesto {
+    display: grid;
+    place-items: center;
+    min-height: 120svh;
+  }
+
+  .manifesto__text {
+    max-width: 18ch;
+    font-size: clamp(2.4rem, 1.2rem + 5.6vw, 7.5rem);
+    line-height: 0.98;
+    text-align: center;
+    text-wrap: balance;
+  }
+</style>

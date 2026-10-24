@@ -1,0 +1,110 @@
+---
+import { LOCALE_PATH, LOCALES, SITE, type Locale } from '../../config/site.ts';
+import type { Dictionary } from '../../i18n/types.ts';
+
+interface Props {
+  dict: Dictionary;
+  locale: Locale;
+}
+
+const { dict, locale } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const year = new Date().getFullYear();
+const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', hu: 'Magyar' };
+---
+
+<footer class="footer" data-scene="footer">
+  <p class="footer__mega display" aria-hidden="true">
+    <span class="split-line">
+      <span data-split="chars" data-reveal-chars>
+        Pumpkin
+      </span>
+    </span>
+    <span class="split-line">
+      <span data-split="chars" data-reveal-chars>
+        Spice
+      </span>
+    </span>
+  </p>
+
+  <div class="footer__bar mono">
+    <p>
+      © {year} {SITE.brand} — {dict.footer.rights}
+    </p>
+    <p class="footer__fiction">{dict.footer.fiction}</p>
+    <ul class="footer__langs" aria-label={dict.a11y.language}>
+      {LOCALES.map((code) => (
+        <li>
+          <a
+            href={`${base}${LOCALE_PATH[code]}`}
+            hreflang={code}
+            lang={code}
+            aria-current={code === locale ? 'true' : undefined}
+          >
+            {LANGUAGE_NAMES[code]}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <a class="footer__top" href="#top" data-magnetic>
+      {dict.footer.top} ↑
+    </a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    z-index: var(--z-content);
+    display: grid;
+    gap: 3rem;
+    padding: var(--section) var(--gutter) max(4.5rem, calc(env(safe-area-inset-bottom) + 3.5rem));
+  }
+
+  .footer__mega {
+    display: grid;
+    font-size: clamp(5.4rem, 1rem + 21vw, 26rem);
+    line-height: 0.8;
+  }
+
+  .footer__mega .split-line:last-child {
+    justify-self: end;
+    color: var(--c-pumpkin);
+  }
+
+  .footer__bar {
+    display: grid;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--c-cream-faint);
+    color: var(--c-cream-dim);
+  }
+
+  .footer__fiction {
+    color: var(--c-gold);
+  }
+
+  .footer__langs {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer__langs a,
+  .footer__top {
+    display: inline-block;
+    padding-block: 0.5rem;
+    color: var(--c-cream);
+  }
+
+  .footer__langs a[aria-current='true'] {
+    color: var(--c-gold);
+  }
+
+  @media (min-width: 900px) {
+    .footer__bar {
+      grid-template-columns: repeat(4, auto);
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+</style>

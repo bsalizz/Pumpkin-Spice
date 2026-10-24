@@ -1,0 +1,57 @@
+---
+import type { Dictionary } from '../../i18n/types.ts';
+
+interface Props {
+  dict: Dictionary;
+  locale: string;
+}
+
+const { dict, locale } = Astro.props;
+const format = new Intl.NumberFormat(locale);
+---
+
+<section class="stats section" data-scene="stats" aria-label={dict.elixir.label}>
+  <dl class="stats__list">
+    {dict.stats.map((stat) => (
+      <div class="stat" data-reveal>
+        <dt class="stat__label mono">{stat.label}</dt>
+        <dd class="stat__value display" data-count={stat.value} data-locale={locale}>
+          {format.format(stat.value)}
+        </dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .stats__list {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .stat {
+    display: grid;
+    gap: 0.6rem;
+    border-top: 1px solid var(--c-cream-faint);
+    padding-top: 1.2rem;
+  }
+
+  .stat__label {
+    order: 2;
+    color: var(--c-cream-dim);
+  }
+
+  .stat__value {
+    order: 1;
+    font-size: clamp(5rem, 2rem + 12vw, 14rem);
+    color: var(--c-gold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 900px) {
+    .stats__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--gutter);
+    }
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+import type { Dictionary } from '../../i18n/types.ts';
+import LineArt, { type LineArtName } from '../ui/LineArt.astro';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { ritual } = Astro.props.dict;
+const ART: readonly LineArtName[] = ['pan', 'drop', 'cups'];
+---
+
+<section class="ritual section" id="ritual" data-scene="ritual" aria-labelledby="ritual-title">
+  <header class="ritual__head">
+    <p class="label mono" data-reveal>
+      {ritual.label}
+    </p>
+    <h2 class="ritual__title display" id="ritual-title">
+      <span class="split-line">
+        <span data-split="chars" data-reveal-chars>
+          {ritual.title}
+        </span>
+      </span>
+    </h2>
+  </header>
+
+  <ol class="ritual__steps">
+    {ritual.steps.map((step, index) => (
+      <li class="step" data-reveal data-tilt>
+        <span class="step__index mono gold">{String(index + 1).padStart(2, '0')}</span>
+        <LineArt name={ART[index] ?? 'drop'} class="step__art" />
+        <h3 class="step__title display">{step.title}</h3>
+        <p class="step__text serif-italic">{step.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .ritual {
+    display: grid;
+    gap: 4rem;
+  }
+
+  .ritual__head {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .ritual__title {
+    font-size: clamp(3rem, 1.2rem + 7.6vw, 9rem);
+    line-height: 0.9;
+  }
+
+  .ritual__steps {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    padding: 2rem 1.5rem 2.4rem;
+    border: 1px solid var(--c-cream-faint);
+    background: linear-gradient(160deg, rgb(36 21 14 / 0.75), rgb(11 7 5 / 0.35));
+    backdrop-filter: blur(6px);
+    transform-style: preserve-3d;
+  }
+
+  .step__index {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.4rem;
+  }
+
+  .step :global(.step__art) {
+    width: 4.5rem;
+    color: var(--c-gold);
+  }
+
+  .step__title {
+    font-size: clamp(2.6rem, 1.6rem + 3vw, 4.4rem);
+  }
+
+  .step__text {
+    color: var(--c-cream-dim);
+  }
+
+  @media (min-width: 900px) {
+    .ritual__steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--gutter);
+    }
+
+    .step {
+      min-height: 22rem;
+      align-content: end;
+    }
+
+    .step:nth-child(2) {
+      translate: 0 4rem;
+    }
+
+    .step:nth-child(3) {
+      translate: 0 8rem;
+    }
+  }
+</style>

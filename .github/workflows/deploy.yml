@@ -1,0 +1,67 @@
+name: Verify & deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Format · lint · typecheck · test · build · SEO audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # format:check, lint, astro check, vitest, build + post-build SEO audit
+      - run: npm run verify
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist
+          include-hidden-files: true
+          retention-days: 7
+
+  deploy:
+    name: Publish to gh-pages
+    needs: verify
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    environment:
+      name: github-pages
+      url: https://bsalizz.github.io/Pumpkin-Spice/
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          publish_branch: gh-pages
+          force_orphan: true
+          enable_jekyll: false
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_message: 'deploy: ${{ github.sha }}'

@@ -1,0 +1,121 @@
+---
+import type { Dictionary } from '../../i18n/types.ts';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { elixir } = Astro.props.dict;
+---
+
+<section class="elixir section" id="elixir" data-scene="elixir" aria-labelledby="elixir-title">
+  <header class="elixir__head">
+    <p class="label mono" data-reveal>
+      {elixir.label}
+    </p>
+    <h2 class="elixir__title display" id="elixir-title">
+      <span class="split-line">
+        <span data-split="chars" data-reveal-chars>
+          {elixir.title}
+        </span>
+      </span>
+    </h2>
+  </header>
+
+  <div class="elixir__stage">
+    <ul class="elixir__notes" style={`--count: ${elixir.notes.length}`} data-notes>
+      {elixir.notes.map((note, index) => (
+        <li class="note" style={`--i: ${index}`}>
+          <span class="note__origin mono">{note.origin}</span>
+          <span class="note__name serif-italic">{note.name}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <p class="elixir__lead serif-italic" data-reveal>
+    {elixir.lead}
+  </p>
+</section>
+
+<style>
+  .elixir {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .elixir__head {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .elixir__title {
+    font-size: var(--fs-h2);
+  }
+
+  .elixir__stage {
+    position: relative;
+    min-height: 60svh;
+    display: grid;
+    align-items: end;
+  }
+
+  .elixir__notes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6rem 1rem;
+  }
+
+  .note {
+    display: grid;
+    gap: 0.2rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--c-cream-faint);
+  }
+
+  .note__origin {
+    color: var(--c-gold);
+  }
+
+  .note__name {
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.6rem);
+    line-height: 1;
+  }
+
+  .elixir__lead {
+    max-width: 24ch;
+    justify-self: end;
+    font-size: var(--fs-lead);
+    line-height: 1.05;
+    text-align: right;
+    text-wrap: balance;
+  }
+
+  @media (min-width: 900px) {
+    .elixir__stage {
+      min-height: 100svh;
+    }
+
+    /* Notes orbit the 3D flacon on large screens. */
+    .elixir__notes {
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
+
+    .note {
+      --angle: calc((var(--i) + 0.5) / var(--count) * 360deg - 90deg);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 13rem;
+      text-align: center;
+      border-top: 0;
+      transform: translate(-50%, -50%)
+        translate(
+          calc(cos(var(--angle)) * min(40vw, 40rem)),
+          calc(sin(var(--angle)) * min(36svh, 24rem))
+        );
+    }
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+import type { Dictionary } from '../../i18n/types.ts';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { hero } = Astro.props.dict;
+---
+
+<section class="hero" id="top" data-scene="hero" aria-labelledby="hero-title">
+  <p class="hero__eyebrow mono" data-hero-fade>
+    {hero.eyebrow}
+  </p>
+
+  <h1 class="hero__title display" id="hero-title">
+    <span class="hero__word hero__word--a split-line" data-hero-word="a">
+      <span data-split="chars">{hero.titleA}</span>
+    </span>
+    <span class="hero__word hero__word--b split-line" data-hero-word="b">
+      <span data-split="chars">{hero.titleB}</span>
+    </span>
+    <span class="hero__number serif-italic gold" data-hero-fade>
+      {hero.number}
+    </span>
+  </h1>
+
+  <p class="hero__tagline serif-italic" data-hero-fade>
+    {hero.tagline}
+  </p>
+
+  <a class="hero__scroll mono" href="#manifesto" data-hero-fade>
+    <span>{hero.scroll}</span>
+    <span class="hero__scroll-line" aria-hidden="true"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: var(--z-content);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100svh;
+    padding: calc(4.5rem + env(safe-area-inset-top)) var(--gutter) 4.5rem;
+  }
+
+  .hero__eyebrow {
+    color: var(--c-cream-dim);
+    text-align: center;
+  }
+
+  .hero__title {
+    display: grid;
+    align-content: center;
+    font-size: var(--fs-mega);
+    line-height: 0.8;
+  }
+
+  .hero__word {
+    padding-block: 0.04em;
+  }
+
+  .hero__word--b {
+    justify-self: end;
+  }
+
+  .hero__number {
+    justify-self: center;
+    margin-top: 0.3em;
+    font-size: clamp(1.6rem, 1rem + 2.4vw, 3.2rem);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .hero__tagline {
+    max-width: 16ch;
+    font-size: var(--fs-lead);
+    line-height: 1.05;
+  }
+
+  .hero__scroll {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--c-cream-dim);
+  }
+
+  .hero__scroll-line {
+    position: relative;
+    width: 1px;
+    height: 3.2rem;
+    overflow: hidden;
+    background: var(--c-cream-faint);
+  }
+
+  .hero__scroll-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--c-gold);
+    animation: scroll-line 2.2s var(--ease-in-out) infinite;
+  }
+
+  @keyframes scroll-line {
+    0% {
+      transform: translateY(-100%);
+    }
+
+    60%,
+    100% {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .hero__title {
+      line-height: 0.78;
+    }
+
+    .hero__tagline {
+      max-width: 22ch;
+    }
+  }
+</style>

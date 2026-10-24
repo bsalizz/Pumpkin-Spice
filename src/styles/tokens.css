@@ -1,0 +1,42 @@
+:root {
+  color-scheme: dark;
+
+  /* Palette — autumn noir */
+  --c-ink: #0b0705;
+  --c-ink-2: #150d09;
+  --c-ink-3: #24150e;
+  --c-cream: #f4e7d4;
+  --c-cream-dim: rgb(244 231 212 / 0.62);
+  --c-cream-faint: rgb(244 231 212 / 0.16);
+  --c-pumpkin: #ea7a2c;
+  --c-ember: #c2401f;
+  --c-gold: #d2ab58;
+  --c-gold-light: #f0d79a;
+  --c-frost: #a9c2d3;
+
+  /* Type */
+  --f-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  --f-serif: 'Cormorant Garamond', 'Garamond', 'Times New Roman', serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Fluid scale (mobile first) */
+  --fs-mono: clamp(0.75rem, 0.7rem + 0.15vw, 0.84rem);
+  --fs-body: clamp(1.15rem, 1.05rem + 0.45vw, 1.45rem);
+  --fs-lead: clamp(1.6rem, 1.2rem + 2vw, 3rem);
+  --fs-h2: clamp(3.2rem, 1.6rem + 8vw, 10rem);
+  --fs-mega: clamp(5.2rem, 1rem + 19vw, 22rem);
+
+  /* Space */
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --section: clamp(6rem, 4rem + 10vw, 14rem);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --z-canvas: 0;
+  --z-content: 2;
+  --z-chrome: 20;
+  --z-cursor: 40;
+  --z-preloader: 50;
+}

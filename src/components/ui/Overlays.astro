@@ -1,0 +1,164 @@
+---
+/** Film grain, vignette, scroll progress and the custom cursor — purely decorative chrome. */
+---
+
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true">
+  <span class="progress__bar" data-progress-bar></span>
+  <span class="progress__value mono" data-progress-value>
+    000
+  </span>
+</div>
+<div class="cursor" aria-hidden="true" data-cursor>
+  <span class="cursor__dot"></span>
+  <span class="cursor__ring"></span>
+</div>
+
+<style>
+  .vignette,
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: calc(var(--z-chrome) - 1);
+  }
+
+  .vignette {
+    background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.65) 100%);
+  }
+
+  .grain {
+    inset: -50%;
+    opacity: 0.09;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.9s steps(6) infinite;
+  }
+
+  @keyframes grain {
+    0% {
+      transform: translate(0, 0);
+    }
+
+    20% {
+      transform: translate(-6%, 4%);
+    }
+
+    40% {
+      transform: translate(5%, -7%);
+    }
+
+    60% {
+      transform: translate(-3%, 8%);
+    }
+
+    80% {
+      transform: translate(7%, 2%);
+    }
+
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  .progress {
+    position: fixed;
+    left: var(--gutter);
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: var(--z-chrome);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--c-cream);
+  }
+
+  .progress__bar {
+    position: relative;
+    width: 3.5rem;
+    height: 1px;
+    background: var(--c-cream-faint);
+    overflow: hidden;
+  }
+
+  .progress__bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--c-cream);
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left;
+  }
+
+  .progress__value {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cursor {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    :global(.js) .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: var(--z-cursor);
+      display: block;
+      pointer-events: none;
+      mix-blend-mode: difference;
+    }
+
+    :global(.js.has-cursor) body,
+    :global(.js.has-cursor) a,
+    :global(.js.has-cursor) button,
+    :global(.js.has-cursor) summary {
+      cursor: none;
+    }
+  }
+
+  .cursor {
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out);
+  }
+
+  :global(.cursor-active) .cursor {
+    opacity: 1;
+  }
+
+  .cursor__dot,
+  .cursor__ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    translate: -50% -50%;
+  }
+
+  .cursor__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--c-cream);
+  }
+
+  .cursor__ring {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--c-cream);
+    transition:
+      width 0.5s var(--ease-out),
+      height 0.5s var(--ease-out),
+      background-color 0.5s var(--ease-out);
+  }
+
+  :global(.cursor-hover) .cursor__ring {
+    width: 84px;
+    height: 84px;
+    background: var(--c-cream);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain {
+      animation: none;
+    }
+  }
+</style>

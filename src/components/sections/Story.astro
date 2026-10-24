@@ -1,0 +1,213 @@
+---
+import type { Chapter, Dictionary } from '../../i18n/types.ts';
+import LineArt, { type LineArtName } from '../ui/LineArt.astro';
+
+interface Props {
+  dict: Dictionary;
+}
+
+const { story } = Astro.props.dict;
+
+const ART: Record<Chapter['mood'], LineArtName> = {
+  october: 'leaves',
+  ember: 'flame',
+  frost: 'frost',
+  forever: 'cups',
+};
+---
+
+<section class="story" id="story" aria-labelledby="story-title">
+  <header class="story__intro section" data-scene="story-intro">
+    <p class="label mono" data-reveal>
+      {story.label}
+    </p>
+    <h2 class="story__title display" id="story-title">
+      <span class="split-line">
+        <span data-split="chars" data-reveal-chars>
+          {story.title}
+        </span>
+      </span>
+    </h2>
+  </header>
+
+  <div class="story__track" data-story style={`--chapters: ${story.chapters.length}`}>
+    {story.chapters.map((chapter, index) => (
+      <div
+        class="story__marker"
+        data-scene={chapter.mood}
+        style={`--i: ${index}`}
+        aria-hidden="true"
+      />
+    ))}
+    <div class="story__sticky">
+      <ol class="story__chapters">
+        {story.chapters.map((chapter, index) => (
+          <li class="chapter" data-chapter={index} data-mood={chapter.mood}>
+            <span class="chapter__numeral display" aria-hidden="true">
+              {chapter.numeral}
+            </span>
+            <LineArt name={ART[chapter.mood]} class="chapter__art" />
+            <h3 class="chapter__title display">
+              <span class="visually-hidden">{chapter.numeral}. </span>
+              <span class="split-line">
+                <span data-split="chars">{chapter.title}</span>
+              </span>
+            </h3>
+            <p class="chapter__line serif-italic">
+              <span data-split="words">{chapter.line}</span>
+            </p>
+          </li>
+        ))}
+      </ol>
+      <div class="story__dots" aria-hidden="true">
+        {story.chapters.map((chapter) => (
+          <span class="mono">{chapter.numeral}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <p class="story__epilogue section serif-italic" data-scene="epilogue">
+    <span data-split="words" data-scrub-words>
+      {story.epilogue}
+    </span>
+  </p>
+</section>
+
+<style>
+  .story {
+    position: relative;
+    z-index: var(--z-content);
+  }
+
+  .story__intro {
+    display: grid;
+    gap: 1.5rem;
+    padding-bottom: calc(var(--section) / 2);
+  }
+
+  .story__title {
+    font-size: var(--fs-h2);
+  }
+
+  .story__track {
+    position: relative;
+  }
+
+  .story__marker {
+    display: none;
+  }
+
+  .story__chapters {
+    display: grid;
+    gap: var(--section);
+    padding: 0 var(--gutter) var(--section);
+  }
+
+  .chapter {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.2rem;
+    text-align: center;
+  }
+
+  .chapter__numeral {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    font-size: clamp(14rem, 50vw, 44rem);
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(210 171 88 / 0.22);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .chapter :global(.chapter__art) {
+    width: clamp(4rem, 10vw, 6.5rem);
+    color: var(--c-gold);
+  }
+
+  .chapter[data-mood='frost'] :global(.chapter__art) {
+    color: var(--c-frost);
+  }
+
+  .chapter__title {
+    font-size: clamp(4.4rem, 2rem + 13vw, 15rem);
+  }
+
+  .chapter__line {
+    max-width: 20ch;
+    font-size: var(--fs-lead);
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .story__dots {
+    display: none;
+  }
+
+  .story__epilogue {
+    max-width: 22ch;
+    margin-inline: auto;
+    font-size: clamp(2rem, 1.2rem + 3.6vw, 5rem);
+    line-height: 1;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* Pinned, cinematic mode — only when JS drives the chapters. */
+  :global(.js) .story__track {
+    height: calc((var(--chapters) + 1) * 100svh);
+  }
+
+  :global(.js) .story__marker {
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 1px;
+    top: calc((var(--i) + 0.5) * 100svh);
+    height: 100svh;
+    pointer-events: none;
+  }
+
+  :global(.js) .story__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  :global(.js) .story__chapters {
+    display: grid;
+    height: 100%;
+    padding: calc(5rem + 6svh) var(--gutter) 0;
+    place-items: start center;
+  }
+
+  :global(.js) .chapter {
+    grid-area: 1 / 1;
+    visibility: hidden;
+  }
+
+  :global(.js) .story__dots {
+    position: absolute;
+    right: var(--gutter);
+    top: 50%;
+    display: grid;
+    gap: 1rem;
+    translate: 0 -50%;
+    color: var(--c-cream-dim);
+  }
+
+  :global(.js) .story__dots span {
+    transition:
+      color 0.6s var(--ease-out),
+      transform 0.6s var(--ease-out);
+  }
+
+  :global(.js) .story__dots span.is-active {
+    color: var(--c-gold);
+    transform: translateX(-0.5rem);
+  }
+</style>

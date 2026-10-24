@@ -1,0 +1,72 @@
+---
+import Emblem from '../components/ui/Emblem.astro';
+import { getDictionary } from '../i18n/index.ts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const dict = getDictionary('en');
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+
+<BaseLayout
+  locale="en"
+  dict={dict}
+  title={`${dict.notFound.title} — Vesperine`}
+  description={`${dict.notFound.text} ${dict.notFound.back}: Pumpkin Spice Nº 31 — ${dict.hero.tagline}`}
+  noindex
+>
+  <main id="main" class="not-found">
+    <Emblem class="not-found__emblem" />
+    <p class="mono gold">404</p>
+    <h1 class="display not-found__title">{dict.notFound.title}</h1>
+    <p class="serif-italic not-found__text">{dict.notFound.text}</p>
+    <a class="mono not-found__link" href={base}>
+      {dict.notFound.back} →
+    </a>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.4rem;
+    min-height: 100svh;
+    padding: var(--gutter);
+    text-align: center;
+    background: radial-gradient(60% 50% at 50% 40%, rgb(234 122 44 / 0.22), transparent 70%);
+  }
+
+  .not-found :global(.not-found__emblem) {
+    width: 6rem;
+    color: var(--c-gold);
+    animation: sway 6s ease-in-out infinite alternate;
+  }
+
+  .not-found__title {
+    font-size: clamp(3.4rem, 1.4rem + 9vw, 9rem);
+    max-width: 12ch;
+  }
+
+  .not-found__text {
+    font-size: var(--fs-lead);
+    color: var(--c-cream-dim);
+    max-width: 24ch;
+  }
+
+  .not-found__link {
+    padding: 1rem 1.6rem;
+    border: 1px solid var(--c-gold);
+    border-radius: 999px;
+  }
+
+  @keyframes sway {
+    from {
+      transform: rotate(-8deg) translateY(-6px);
+    }
+
+    to {
+      transform: rotate(8deg) translateY(6px);
+    }
+  }
+</style>
