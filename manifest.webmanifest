@@ -1,0 +1,30 @@
+{
+  "name": "Pumpkin Spice Nº 31 — Vesperine",
+  "short_name": "Pumpkin Spice Nº 31",
+  "description": "Pumpkin Spice Nº 31 by Vesperine: a luxury pumpkin spice elixir of seven rare spices and roasted heirloom pumpkin, aged 31 days in oak. 1,031 numbered crystal flacons.",
+  "lang": "en",
+  "start_url": "/Pumpkin-Spice/",
+  "scope": "/Pumpkin-Spice/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0705",
+  "theme_color": "#0b0705",
+  "icons": [
+    {
+      "src": "/Pumpkin-Spice/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Pumpkin-Spice/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/Pumpkin-Spice/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
