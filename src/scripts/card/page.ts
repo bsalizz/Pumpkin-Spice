@@ -90,6 +90,9 @@ export async function bootCard(): Promise<void> {
     status: $<HTMLElement>(root, '[data-card-status]'),
     broken: $<HTMLElement>(root, '[data-card-broken]'),
     reply: $<HTMLAnchorElement>(root, '[data-card-reply]'),
+    stage: $<HTMLElement>(root, '.stage'),
+    pages: $<HTMLElement>(root, '[data-card-pages]'),
+    show: $<HTMLButtonElement>(root, '[data-card-show]'),
     langs: root.querySelectorAll<HTMLAnchorElement>('[data-card-lang]'),
   };
   const composeTitle = ui.title.textContent;
@@ -214,7 +217,10 @@ export async function bootCard(): Promise<void> {
 
   ui.form.addEventListener('focusin', (event) => {
     const name = (event.target as HTMLInputElement | null)?.name;
-    if (name === 'message' || name === 'from') stage?.setOpen(true);
+    if (name === 'message' || name === 'from') {
+      stage?.setOpen(true);
+      stage?.showPage(0);
+    }
     if (name === 'to' || name === 'template') stage?.setOpen(false);
   });
 
@@ -232,8 +238,11 @@ export async function bootCard(): Promise<void> {
         behavior: env.reducedMotion ? 'auto' : 'smooth',
         block: 'center',
       });
-      ui.link.focus({ preventScroll: true });
-      ui.link.select();
+      // Selecting the link helps a mouse user copy it; on a phone it only raises the keyboard.
+      if (env.finePointer) {
+        ui.link.focus({ preventScroll: true });
+        ui.link.select();
+      }
     })();
   });
 
@@ -258,7 +267,39 @@ export async function bootCard(): Promise<void> {
 
   ui.toggle.addEventListener('click', () => stage?.toggle());
 
-  window.addEventListener('hashchange', () => void route());
+  for (const dot of ui.pages.querySelectorAll<HTMLButtonElement>('[data-page]')) {
+    dot.addEventListener('click', () => stage?.showPage(Number(dot.dataset['page'])));
+  }
+
+  // While writing on a phone the card scrolls away: offer a way back to it, except while
+  // a field is being typed into (the keyboard is up then).
+  let stageInView = true;
+  let typing = false;
+  const syncShow = (): void => {
+    ui.show.hidden = stageInView || typing || mode !== 'compose' || !stage;
+  };
+  new IntersectionObserver(
+    ([entry]) => {
+      stageInView = Boolean(entry?.isIntersecting);
+      syncShow();
+    },
+    { threshold: 0.25 },
+  ).observe(ui.stage);
+  ui.form.addEventListener('focusin', () => {
+    typing = true;
+    syncShow();
+  });
+  ui.form.addEventListener('focusout', () => {
+    typing = false;
+    syncShow();
+  });
+  ui.show.addEventListener('click', () => {
+    ui.stage.scrollIntoView({ behavior: env.reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    stage?.setOpen(Boolean(card.message || card.to || card.from));
+    stage?.showPage(0);
+  });
+
+  window.addEventListener('hashchange', () => void route().then(syncShow));
 
   await route();
 
@@ -278,6 +319,12 @@ export async function bootCard(): Promise<void> {
       ui.toggle.textContent = open ? stageCopy.close : stageCopy.open;
       ui.toggle.setAttribute('aria-pressed', String(open));
       window.clearTimeout(autoOpen);
+    },
+    onPageChange: (page) => {
+      ui.pages.hidden = page === null;
+      for (const dot of ui.pages.querySelectorAll<HTMLButtonElement>('[data-page]')) {
+        dot.setAttribute('aria-current', String(Number(dot.dataset['page']) === page));
+      }
     },
   });
   ui.canvas.addEventListener('webglcontextlost', (event) => {
@@ -300,5 +347,6 @@ export async function bootCard(): Promise<void> {
   await stage.prepare(contentFor(card, copy));
   stage.start();
   root.classList.add('is-live');
+  syncShow();
   if (root.dataset['mode'] === 'view') scheduleAutoOpen();
 }

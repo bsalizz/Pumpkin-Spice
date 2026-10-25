@@ -46,8 +46,10 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+    # Not `github-pages`: GitHub restricts that environment to the gh-pages branch, while
+    # this job runs on main and only pushes the built site to gh-pages.
     environment:
-      name: github-pages
+      name: production
       url: https://bsalizz.github.io/Pumpkin-Spice/
     steps:
       - uses: actions/download-artifact@v8

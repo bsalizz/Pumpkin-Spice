@@ -236,6 +236,9 @@ export const hu: Dictionary = {
       open: 'Képeslap kinyitása',
       close: 'Képeslap becsukása',
       loading: 'Hajtogatjuk a lapot',
+      inside: 'A lap belseje',
+      message: 'Az üzenet',
+      show: 'Mutasd a lapot',
     },
     letter: {
       dear: 'Kedves',

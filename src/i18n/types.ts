@@ -159,6 +159,11 @@ export interface Dictionary {
       readonly open: string;
       readonly close: string;
       readonly loading: string;
+      /** Names of the two pages of the open card, for the page dots on small screens. */
+      readonly inside: string;
+      readonly message: string;
+      /** Brings the card back into view while writing on a phone. */
+      readonly show: string;
     };
     readonly letter: {
       /** Salutation before the recipient's name, e.g. "Dear". */

@@ -71,6 +71,11 @@ export interface StageOptions {
   /** Breathing room around the card; 1 = edge to edge. */
   readonly margin: number;
   readonly onOpenChange?: (open: boolean) => void;
+  /**
+   * On frames too narrow for the spread, the open card is read one page at a time:
+   * 0 is the message page, 1 the inside of the cover; null when not paging.
+   */
+  readonly onPageChange?: (page: number | null) => void;
 }
 
 const FOV = 30;
@@ -91,6 +96,12 @@ const TEXTURE_WIDTH: Record<Quality['tier'], number> = {
   low: 1024,
   software: 768,
 };
+
+/** No sharper than the screen can show: a phone gets lighter textures (and keeps its tab). */
+function textureWidth(tier: Quality['tier']): number {
+  const screenWidth = Math.min(window.screen.width, window.screen.height) * window.devicePixelRatio;
+  return Math.min(TEXTURE_WIDTH[tier], Math.max(768, Math.ceil(screenWidth / 256) * 256));
+}
 
 interface WeatherMix {
   readonly leaves: number;
@@ -218,6 +229,10 @@ export class CardStage {
     tiltX: 0,
     tiltY: 0,
     intro: 0,
+    /** Paging across the open card on narrow frames: 0 = message page, 1 = inside. */
+    pan: 0,
+    panVelocity: 0,
+    page: 0,
   };
   private readonly hover = { x: 0, y: 0 };
   private readonly tilt = { x: 0, y: 0, baseBeta: Number.NaN, baseGamma: Number.NaN };
@@ -235,6 +250,7 @@ export class CardStage {
   private readonly view = { width: 1, height: 1 };
   private readonly focusRect = { x: 0, y: 0, width: 1, height: 1 };
   private spreadLayout = false;
+  private reportedPage: number | null = null;
   private pixelRatio: number;
   private slowFrames = 0;
   private running = false;
@@ -268,7 +284,7 @@ export class CardStage {
     grain.wrapT = RepeatWrapping;
     grain.repeat.set(3, 3 * HEIGHT);
 
-    const width = TEXTURE_WIDTH[this.quality.tier];
+    const width = textureWidth(this.quality.tier);
     this.cover = new PrintedFace(width, grain, anisotropy);
     this.inside = new PrintedFace(width, grain, anisotropy);
     this.message = new PrintedFace(width, grain, anisotropy);
@@ -351,7 +367,19 @@ export class CardStage {
     const target = open ? 1 : 0;
     if (target === this.motion.openTarget) return;
     this.motion.openTarget = target;
+    this.motion.page = 0;
     this.options.onOpenChange?.(open);
+  }
+
+  /** Turns to a page of the open card (see `onPageChange`). */
+  showPage(page: number): void {
+    if (!this.paged) return;
+    this.motion.page = page > 0 ? 1 : 0;
+  }
+
+  /** The open card on a narrow frame shows one page at a time. */
+  private get paged(): boolean {
+    return !this.spreadLayout && this.motion.openTarget === 1;
   }
 
   toggle(): void {
@@ -555,13 +583,20 @@ export class CardStage {
         drag.moved = true;
       }
       if (!drag.moved) return;
-      const yaw = (dx / rect.width) * 3.4;
       const pitch = (dy / rect.height) * 1.6;
       const m = this.motion;
-      m.yaw += yaw;
       m.pitch = clamp(m.pitch + pitch, 0.55);
-      m.yawVelocity = damp(m.yawVelocity, yaw / dt, 18, dt);
       m.pitchVelocity = damp(m.pitchVelocity, pitch / dt, 18, dt);
+      if (this.paged) {
+        // Swiping slides across the open card, with a little give past either page.
+        const pan = dx / (this.focusRect.width * 0.9);
+        m.pan = Math.min(1.15, Math.max(-0.15, m.pan + pan));
+        m.panVelocity = damp(m.panVelocity, pan / dt, 18, dt);
+        return;
+      }
+      const yaw = (dx / rect.width) * 3.4;
+      m.yaw += yaw;
+      m.yawVelocity = damp(m.yawVelocity, yaw / dt, 18, dt);
     });
 
     const release = (event: PointerEvent, cancelled: boolean): void => {
@@ -572,6 +607,10 @@ export class CardStage {
       const m = this.motion;
       if (!cancelled && !drag.moved && performance.now() - drag.start < TAP_TIME) {
         this.tap();
+        return;
+      }
+      if (this.paged) {
+        m.page = Math.min(1, Math.max(0, Math.round(m.pan + m.panVelocity * 0.2)));
         return;
       }
       // Throwing the card can flip it over: settle on whichever side it lands.
@@ -682,17 +721,28 @@ export class CardStage {
     m.hoverY = damp(m.hoverY, reduced ? 0 : this.hover.y, 3, delta);
     m.tiltX = damp(m.tiltX, this.tilt.x, 6, delta);
     m.tiltY = damp(m.tiltY, this.tilt.y, 6, delta);
+    if (!this.drag || !this.paged) {
+      const page = this.paged ? m.page : 0;
+      m.panVelocity += (page - m.pan) * 60 * delta;
+      m.panVelocity *= Math.exp(-11 * delta);
+      m.pan += m.panVelocity * delta;
+    }
+    this.reportPage();
 
     const spread = this.spreadLayout;
     const open = Math.max(0, m.open);
     this.hinge.rotation.y = -m.open * OPEN_ANGLE;
-    // Wide frames show the whole spread; narrow ones keep the message page centred.
-    this.spread.position.x = spread ? open * 0.49 : 0;
+    // Wide frames show the whole spread; narrow ones centre one page and slide between them.
+    this.spread.position.x = spread ? open * 0.49 : open * m.pan * 0.99;
 
     const idle = reduced ? 0 : 1;
     this.root.rotation.set(
       m.pitch + m.hoverY * 0.12 + m.tiltY * 0.6 + Math.sin(time * 0.7) * 0.025 * idle,
-      m.yaw + m.hoverX * 0.18 + m.tiltX * 0.7 + (1 - arrival) * -1.4,
+      m.yaw +
+        m.hoverX * 0.18 +
+        m.tiltX * 0.7 +
+        (1 - arrival) * -1.4 +
+        clamp(m.panVelocity * -0.05, 0.12),
       Math.sin(time * 0.5) * 0.015 * idle,
     );
     this.root.position.set(
@@ -704,6 +754,13 @@ export class CardStage {
     this.frameCamera(spread ? 1 + open * 0.98 : 1, delta);
     this.updateWorld(delta, time);
     this.renderer.render(this.scene, this.camera);
+  }
+
+  private reportPage(): void {
+    const page = this.paged ? this.motion.page : null;
+    if (page === this.reportedPage) return;
+    this.reportedPage = page;
+    this.options.onPageChange?.(page);
   }
 
   /** Keeps the card (closed or open) fully in view, at any aspect ratio. */

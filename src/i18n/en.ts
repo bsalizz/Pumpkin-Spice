@@ -236,6 +236,9 @@ export const en: Dictionary = {
       open: 'Open the card',
       close: 'Close the card',
       loading: 'Folding the card',
+      inside: 'Inside of the card',
+      message: 'The message',
+      show: 'See the card',
     },
     letter: {
       dear: 'Dear',
