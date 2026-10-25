@@ -1,5 +1,7 @@
 ---
+import spices from '../../assets/images/elixir-spices.jpg';
 import type { Dictionary } from '../../i18n/types.ts';
+import CinemaFrame from '../ui/CinemaFrame.astro';
 
 interface Props {
   dict: Dictionary;
@@ -36,6 +38,8 @@ const { elixir } = Astro.props.dict;
   <p class="elixir__lead serif-italic" data-reveal>
     {elixir.lead}
   </p>
+
+  <CinemaFrame src={spices} alt={elixir.imageAlt} />
 </section>
 
 <style>

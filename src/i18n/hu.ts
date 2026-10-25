@@ -40,19 +40,32 @@ export const hu: Dictionary = {
         numeral: 'I',
         title: 'Október',
         line: 'Ott találkoztak, ahol a fahéj illata a hidegbe olvadt.',
+        imageAlt:
+          'Két szerelmes hátulról, alkonyati macskaköves utcán, gőzölgő poharakkal, hulló juharlevelek között.',
         mood: 'october',
       },
       {
         numeral: 'II',
         title: 'Parázs',
         line: 'Minden estének szerecsendió és ígéret íze volt.',
+        imageAlt:
+          'Két kéz összeér egy gyertyafényes asztalon, két sütőtökös latte között, háttérben izzó kandalló.',
         mood: 'ember',
       },
-      { numeral: 'III', title: 'Fagy', line: 'Eljött az első fagy. Ő nem.', mood: 'frost' },
+      {
+        numeral: 'III',
+        title: 'Fagy',
+        line: 'Eljött az első fagy. Ő nem.',
+        imageAlt:
+          'Egy nő egyedül vár egy dérrel borított hídon a lámpa alatt, a hidegben látszik a lehelete.',
+        mood: 'frost',
+      },
       {
         numeral: 'IV',
         title: 'Örökké',
         line: 'Azóta is két csészét tölt. Minden októberben.',
+        imageAlt:
+          'Két csésze egy esős őszi ablakpárkányon: az egyiket egy nő fogja, a másikhoz senki sem nyúlt.',
         mood: 'forever',
       },
     ],
@@ -62,6 +75,8 @@ export const hu: Dictionary = {
     label: 'Az elixír',
     title: 'Hét fűszer. Egy szív.',
     lead: 'Pörkölt sütőtök és hét ritka fűszer, harmincegy napig francia tölgyben pihentetve.',
+    imageAlt:
+      'Fahéj, szerecsendió, szegfűszeg, vanília, csillagánizs, gyömbér és szegfűbors fekete palán egy sütőtök mellett.',
     notes: [
       { name: 'Fahéj', origin: 'Ceylon' },
       { name: 'Szerecsendió', origin: 'Grenada' },
@@ -87,6 +102,8 @@ export const hu: Dictionary = {
   ritual: {
     label: 'A rituálé',
     title: 'Melegíts. Csepegtess. Emlékezz.',
+    imageAlt:
+      'Borostyánszínű sütőtökös elixír ömlik egy aranydugós kristálykancsóból egy kristálypohárba.',
     steps: [
       { title: 'Melegíts', text: 'Tej vagy eszpresszó. Soha ne forrjon.' },
       { title: 'Csepegtess', text: 'Két csepp. A harmadik a szívnek.' },

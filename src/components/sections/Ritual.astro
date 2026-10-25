@@ -1,5 +1,7 @@
 ---
+import pour from '../../assets/images/ritual-pour.jpg';
 import type { Dictionary } from '../../i18n/types.ts';
+import CinemaFrame from '../ui/CinemaFrame.astro';
 import LineArt, { type LineArtName } from '../ui/LineArt.astro';
 
 interface Props {
@@ -23,6 +25,8 @@ const ART: readonly LineArtName[] = ['pan', 'drop', 'cups'];
       </span>
     </h2>
   </header>
+
+  <CinemaFrame src={pour} alt={ritual.imageAlt} />
 
   <ol class="ritual__steps">
     {ritual.steps.map((step, index) => (

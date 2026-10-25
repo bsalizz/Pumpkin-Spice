@@ -8,6 +8,7 @@ import { splitText } from './split.ts';
  * - `[data-reveal]`        fade + rise once in view
  * - `[data-reveal-chars]`  characters rise from a clipped line
  * - `[data-scrub-words]`   words brighten as the reader scrolls through them
+ * - `[data-unveil]`        a photograph opens from a clipped frame, drifting in parallax
  * - `[data-draw]`          SVG line art draws itself
  */
 export function initReveals(reducedMotion: boolean): void {
@@ -54,6 +55,27 @@ export function initReveals(reducedMotion: boolean): void {
         ease: 'none',
         stagger: 0.1,
         scrollTrigger: { trigger: element, start: 'top 80%', end: 'bottom 45%', scrub: 0.8 },
+      },
+    );
+  });
+
+  gsap.utils.toArray<HTMLElement>('[data-unveil]').forEach((frame) => {
+    gsap.fromTo(
+      frame,
+      { clipPath: 'inset(18% 8% 18% 8%)' },
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        ease: 'none',
+        scrollTrigger: { trigger: frame, start: 'top 95%', end: 'center 55%', scrub: 0.6 },
+      },
+    );
+    gsap.fromTo(
+      frame.querySelector('img'),
+      { yPercent: -15 },
+      {
+        yPercent: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: frame, start: 'top bottom', end: 'bottom top', scrub: true },
       },
     );
   });

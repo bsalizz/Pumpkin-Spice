@@ -40,19 +40,32 @@ export const en: Dictionary = {
         numeral: 'I',
         title: 'October',
         line: 'They met where cinnamon curled into the cold.',
+        imageAlt:
+          'Two lovers seen from behind on a cobblestone street at dusk, holding steaming cups as maple leaves fall.',
         mood: 'october',
       },
       {
         numeral: 'II',
         title: 'Ember',
         line: 'Every evening tasted of nutmeg and promise.',
+        imageAlt:
+          'Two hands meeting across a candlelit table between two cups of pumpkin spice latte, a fire glowing behind.',
         mood: 'ember',
       },
-      { numeral: 'III', title: 'Frost', line: 'The first frost came. He did not.', mood: 'frost' },
+      {
+        numeral: 'III',
+        title: 'Frost',
+        line: 'The first frost came. He did not.',
+        imageAlt:
+          'A woman waiting alone on a frost-covered bridge beneath a streetlamp, her breath visible in the cold.',
+        mood: 'frost',
+      },
       {
         numeral: 'IV',
         title: 'Forever',
         line: 'She still pours two cups. Every October.',
+        imageAlt:
+          'Two cups on a rainy autumn windowsill, one held by a woman, the other left untouched.',
         mood: 'forever',
       },
     ],
@@ -62,6 +75,8 @@ export const en: Dictionary = {
     label: 'The elixir',
     title: 'Seven spices. One heart.',
     lead: 'Roasted heirloom pumpkin and seven rare spices, rested thirty-one days in French oak.',
+    imageAlt:
+      'Cinnamon, nutmeg, cloves, vanilla, star anise, ginger and allspice on black slate beside an heirloom pumpkin.',
     notes: [
       { name: 'Cinnamon', origin: 'Ceylon' },
       { name: 'Nutmeg', origin: 'Grenada' },
@@ -87,6 +102,8 @@ export const en: Dictionary = {
   ritual: {
     label: 'The ritual',
     title: 'Warm. Pour. Remember.',
+    imageAlt:
+      'Amber pumpkin spice elixir poured from a crystal decanter with a gold stopper into a crystal glass.',
     steps: [
       { title: 'Warm', text: 'Milk or espresso. Never boiling.' },
       { title: 'Pour', text: 'Two drops. A third for the heart.' },

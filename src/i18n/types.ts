@@ -2,6 +2,8 @@ export interface Chapter {
   readonly numeral: string;
   readonly title: string;
   readonly line: string;
+  /** Describes the chapter's photograph for screen readers and search. */
+  readonly imageAlt: string;
   /** Visual mood consumed by the WebGL timeline. */
   readonly mood: 'october' | 'ember' | 'frost' | 'forever';
 }
@@ -66,6 +68,7 @@ export interface Dictionary {
     readonly label: string;
     readonly title: string;
     readonly lead: string;
+    readonly imageAlt: string;
     readonly notes: readonly Note[];
   };
   readonly marquee: readonly string[];
@@ -73,6 +76,7 @@ export interface Dictionary {
   readonly ritual: {
     readonly label: string;
     readonly title: string;
+    readonly imageAlt: string;
     readonly steps: readonly Step[];
   };
   readonly reserve: {

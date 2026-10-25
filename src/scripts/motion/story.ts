@@ -5,6 +5,26 @@ import { clamp } from './env.ts';
 import { splitText } from './split.ts';
 import { moodState, type Mood } from '../state.ts';
 
+/** Photographs stay veiled so the chapter copy reads on top of them. */
+const PLATE_OPACITY = 0.62;
+
+/** Crossfades a chapter photograph with a slow push-in. */
+function showPlate(plate: HTMLElement | undefined, visible: boolean, reducedMotion: boolean): void {
+  if (!plate) return;
+  const image = plate.querySelector('img');
+  gsap.killTweensOf([plate, image]);
+  if (reducedMotion) {
+    gsap.set(plate, { autoAlpha: visible ? PLATE_OPACITY : 0 });
+    return;
+  }
+  if (visible) {
+    gsap.to(plate, { autoAlpha: PLATE_OPACITY, duration: 1.6, ease: 'power2.out' });
+    gsap.fromTo(image, { scale: 1.14 }, { scale: 1, duration: 9, ease: 'power1.out' });
+  } else {
+    gsap.to(plate, { autoAlpha: 0, duration: 1.1, ease: 'power2.inOut' });
+  }
+}
+
 interface ChapterParts {
   readonly root: HTMLElement;
   readonly mood: Mood;
@@ -101,6 +121,16 @@ export function initStory(reducedMotion: boolean): void {
 
   const chapters = Array.from(track.querySelectorAll<HTMLElement>('[data-chapter]')).map(collect);
   const dots = Array.from(track.querySelectorAll<HTMLElement>('.story__dots span'));
+  const plates = Array.from(track.querySelectorAll<HTMLElement>('[data-plate]'));
+  // Hidden plates never intersect, so fetch them all once the story is a screen away.
+  ScrollTrigger.create({
+    trigger: track,
+    start: 'top bottom+=100%',
+    once: true,
+    onEnter: () => {
+      plates.forEach((plate) => plate.querySelector('img')?.setAttribute('loading', 'eager'));
+    },
+  });
   if (chapters.length === 0) return;
 
   let active = -1;
@@ -110,6 +140,8 @@ export function initStory(reducedMotion: boolean): void {
     const previous = chapters[active];
     const next = chapters[index];
     if (previous) leave(previous, direction, reducedMotion);
+    showPlate(plates[active], false, reducedMotion);
+    showPlate(plates[index], true, reducedMotion);
     if (next) {
       enter(next, direction, reducedMotion);
       moodState.current = next.mood;
