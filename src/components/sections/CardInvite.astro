@@ -1,0 +1,84 @@
+---
+import { LOCALE_PATH, type Locale } from '../../config/site.ts';
+import type { Dictionary } from '../../i18n/types.ts';
+
+interface Props {
+  dict: Dictionary;
+  locale: Locale;
+}
+
+const { dict, locale } = Astro.props;
+const { invite } = dict.card;
+const href = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${LOCALE_PATH[locale]}card/`;
+---
+
+<section class="invite section" aria-labelledby="invite-title">
+  <p class="label mono" data-reveal>
+    {invite.label}
+  </p>
+  <h2 class="invite__title display" id="invite-title">
+    <span class="split-line">
+      <span data-split="chars" data-reveal-chars>
+        {invite.title}
+      </span>
+    </span>
+  </h2>
+  <p class="invite__text serif-italic" data-reveal>
+    {invite.text}
+  </p>
+  <a class="invite__cta mono" href={href} data-magnetic data-reveal>
+    <span>{invite.cta}</span>
+    <span aria-hidden="true">→</span>
+  </a>
+</section>
+
+<style>
+  .invite {
+    display: grid;
+    justify-items: center;
+    gap: 1.6rem;
+    text-align: center;
+  }
+
+  .invite__title {
+    font-size: var(--fs-h2);
+  }
+
+  .invite__text {
+    max-width: 30ch;
+    font-size: var(--fs-lead);
+    color: var(--c-cream-dim);
+  }
+
+  .invite__cta {
+    position: relative;
+    display: inline-flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+    padding: 1.3rem 2.2rem;
+    border: 1px solid var(--c-gold);
+    border-radius: 999px;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 0.6s var(--ease-out);
+  }
+
+  .invite__cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--c-gold);
+    transform: translateY(101%);
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .invite__cta:hover {
+    color: var(--c-ink);
+  }
+
+  .invite__cta:hover::before {
+    transform: none;
+  }
+</style>

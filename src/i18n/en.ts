@@ -21,6 +21,7 @@ export const en: Dictionary = {
     elixir: 'Elixir',
     ritual: 'Ritual',
     reserve: 'Reserve',
+    card: 'Send a card',
   },
   preloader: 'Pouring October',
   hero: {
@@ -151,6 +152,105 @@ export const en: Dictionary = {
     fiction: 'A fictional house. A real October.',
     rights: 'All seasons reserved.',
     top: 'Back to the first leaf',
+  },
+  card: {
+    meta: {
+      title: 'Pumpkin Spice Greeting Card — Send October | Vesperine',
+      description:
+        'Send a 3D pumpkin spice greeting card to someone you love: five autumn designs, your own words, one private link. Nothing is stored anywhere.',
+      ogImageAlt:
+        'A gold-foiled Vesperine greeting card opening among falling autumn leaves, with a handwritten message inside.',
+    },
+    label: 'Greeting card',
+    title: 'Send October',
+    lead: 'Choose a card and write your words. They travel inside the link itself, so nothing is stored anywhere.',
+    invite: {
+      label: 'For someone you love',
+      title: 'Send October',
+      text: 'A 3D card in gold foil, your own words inside, delivered as a single private link.',
+      cta: 'Write a card',
+    },
+    designs: [
+      {
+        id: 'october',
+        name: 'First Leaf',
+        cover: 'For you,\nthis October',
+        quote: 'Some loves arrive the way autumn does: all at once, in gold.',
+        message:
+          'The first leaf fell today and I thought of you. Pour two cups and save me the seat by the window.',
+      },
+      {
+        id: 'ember',
+        name: 'Ember',
+        cover: 'You set\nthe hearth alight',
+        quote: 'Cinnamon, clove and a fire that never learned to go out.',
+        message:
+          'Every evening by the fire is warmer because you are in it. Thank you for the spark, and for staying.',
+      },
+      {
+        id: 'frost',
+        name: 'Frost',
+        cover: 'I still\npour two cups',
+        quote: 'Even the first frost cannot unwrite what October wrote.',
+        message:
+          'The window is cold and the second cup goes untouched, but I keep pouring it. I miss you. Come home soon.',
+      },
+      {
+        id: 'forever',
+        name: 'Forever',
+        cover: 'Every October,\nwith you',
+        quote: 'Two cups, one table, thirty-one Octobers and counting.',
+        message:
+          'Of all the seasons I have known, my favourite is the one that has you in it. Happy October, my love.',
+      },
+      {
+        id: 'ritual',
+        name: 'Ritual',
+        cover: 'A little\nOctober for you',
+        quote: 'A slow pour, a warm cup, a moment that is only yours.',
+        message:
+          'A small ritual for a big heart: take a quiet moment for yourself today. You deserve every warm sip.',
+      },
+    ],
+    form: {
+      design: 'Choose a card',
+      to: 'To',
+      toPlaceholder: 'Their name',
+      message: 'Your words',
+      from: 'From',
+      fromPlaceholder: 'Your name',
+      remaining: 'characters left',
+      create: 'Create the link',
+      ready: 'Your card is ready. Send the link to the one you love.',
+      link: 'Card link',
+      copy: 'Copy link',
+      copied: 'Link copied',
+      share: 'Share',
+      preview: 'Open it as they will',
+      privacy:
+        'Your words live only inside the link: no account, no server, no copy kept anywhere.',
+    },
+    stage: {
+      label: 'Interactive 3D greeting card. Drag to turn it, tap to open it.',
+      hint: 'Drag to turn · Tap to open',
+      open: 'Open the card',
+      close: 'Close the card',
+      loading: 'Folding the card',
+    },
+    letter: {
+      dear: 'Dear',
+      closing: 'With love,',
+      back: 'Poured with love',
+    },
+    view: {
+      title: 'Someone poured you October',
+      for: 'A card for',
+      reply: 'Write one back',
+      own: 'Send your own card',
+      broken:
+        'This card could not be opened. The link may be incomplete; ask the sender to copy it again.',
+      shareText: 'I poured you a little October.',
+    },
   },
   notFound: {
     title: 'This leaf has fallen',

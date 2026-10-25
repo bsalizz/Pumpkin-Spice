@@ -2,6 +2,7 @@
 import type { Locale } from '../config/site.ts';
 import { getDictionary } from '../i18n/index.ts';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CardInvite from './sections/CardInvite.astro';
 import Elixir from './sections/Elixir.astro';
 import Faq from './sections/Faq.astro';
 import Footer from './sections/Footer.astro';
@@ -44,6 +45,7 @@ const dict = getDictionary(locale);
     <Ritual dict={dict} />
     <Reserve dict={dict} locale={locale} />
     <Faq dict={dict} />
+    <CardInvite dict={dict} locale={locale} />
   </main>
 
   <Footer dict={dict} locale={locale} />

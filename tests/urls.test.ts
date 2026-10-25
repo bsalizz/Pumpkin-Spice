@@ -23,4 +23,12 @@ describe('alternates', () => {
       { hreflang: 'x-default', href: 'https://bsalizz.github.io/Pumpkin-Spice/' },
     ]);
   });
+
+  it('resolves sub-pages under each locale root', () => {
+    expect(alternates('card/')).toEqual([
+      { hreflang: 'en', href: 'https://bsalizz.github.io/Pumpkin-Spice/card/' },
+      { hreflang: 'hu', href: 'https://bsalizz.github.io/Pumpkin-Spice/hu/card/' },
+      { hreflang: 'x-default', href: 'https://bsalizz.github.io/Pumpkin-Spice/card/' },
+    ]);
+  });
 });

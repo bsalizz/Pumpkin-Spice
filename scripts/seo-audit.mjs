@@ -37,8 +37,20 @@ function walk(dir) {
 
 const htmlFiles = walk(DIST).filter((file) => file.endsWith('.html'));
 
+/** Splits a built page into its locale and the page path below the locale root. */
+function pageOf(name) {
+  const path = name.replace(/index\.html$/, '');
+  const [locale, root] = Object.entries(LOCALES)
+    .filter(([, prefix]) => path.startsWith(prefix))
+    .sort((a, b) => b[1].length - a[1].length)[0];
+  return { locale, page: path.slice(root.length) };
+}
+
+const indexablePages = [];
+
 for (const file of htmlFiles) {
   const name = relative(DIST, file);
+  const { page } = pageOf(name);
   const root = parse(readFileSync(file, 'utf8'));
   const meta = (selector) => root.querySelector(selector)?.getAttribute('content') ?? '';
   const robots = meta('meta[name="robots"]');
@@ -78,6 +90,7 @@ for (const file of htmlFiles) {
   }
 
   if (!indexable) continue;
+  indexablePages.push(name.replace(/index\.html$/, ''));
 
   const canonical = root.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? '';
   if (!canonical.startsWith(SITE)) fail(name, `canonical "${canonical}" is not under ${SITE}`);
@@ -89,10 +102,11 @@ for (const file of htmlFiles) {
       .map((link) => [link.getAttribute('hreflang'), link.getAttribute('href')]),
   );
   for (const [locale, path] of Object.entries(LOCALES)) {
-    if (alternates.get(locale) !== `${SITE}${path}`)
+    if (alternates.get(locale) !== `${SITE}${path}${page}`)
       fail(name, `hreflang "${locale}" missing/wrong`);
   }
-  if (alternates.get('x-default') !== SITE) fail(name, 'hreflang x-default missing/wrong');
+  if (alternates.get('x-default') !== `${SITE}${page}`)
+    fail(name, 'hreflang x-default missing/wrong');
   if (![...alternates.values()].includes(canonical)) fail(name, 'canonical not among hreflang set');
 
   for (const property of [
@@ -120,7 +134,11 @@ for (const file of htmlFiles) {
       fail(name, `invalid JSON-LD: ${error.message}`);
     }
   }
-  for (const type of ['Organization', 'WebSite', 'WebPage', 'Product', 'FAQPage']) {
+  const required =
+    page === ''
+      ? ['Organization', 'WebSite', 'WebPage', 'Product', 'FAQPage']
+      : ['Organization', 'WebSite', 'WebPage', 'BreadcrumbList'];
+  for (const type of required) {
     if (!types.has(type)) fail(name, `JSON-LD lacks ${type}`);
   }
 }
@@ -135,7 +153,7 @@ if (!existsSync(join(DIST, 'sitemap-index.xml'))) fail('sitemap-index.xml', 'mis
 
 const sitemapFiles = readdirSync(DIST).filter((file) => /^sitemap-\d+\.xml$/.test(file));
 const sitemap = sitemapFiles.map((file) => readFileSync(join(DIST, file), 'utf8')).join('\n');
-for (const path of Object.values(LOCALES)) {
+for (const path of indexablePages) {
   if (!sitemap.includes(`<loc>${SITE}${path}</loc>`)) fail('sitemap', `missing ${SITE}${path}`);
 }
 if (!sitemap.includes('hreflang="hu"')) fail('sitemap', 'missing xhtml:link alternates');

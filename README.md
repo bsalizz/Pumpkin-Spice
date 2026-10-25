@@ -34,6 +34,11 @@ Everything visual is generated — no stock assets:
   every viewport size.
 - **Motion (GSAP + ScrollTrigger + Lenis)** — preloader, split-text reveals, scrubbed
   words, velocity marquee, counters, magnetic/tilt pointer effects, custom cursor.
+- **Greeting card (`/card/`)** — a gold-foiled 3D card in five designs (First Leaf, Ember,
+  Frost, Forever, Ritual) with the sender's own words. Drag to turn or flip it, tap to open
+  it, tilt the phone. The card is deflated and base64url-encoded into the link's `#`
+  fragment, which never reaches a server: no backend, nothing stored. Decoding is
+  size-capped, validated and rendered as canvas/text only.
 - **Sound** — an optional generative Web Audio score (pads, wind, bells) that follows the
   chapter mood. Off by default.
 - **Adaptive quality** — three GPU tiers, dynamic pixel ratio, WebGL-loss fallback,

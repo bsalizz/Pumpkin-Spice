@@ -98,6 +98,67 @@ export function buildJsonLd({ locale, dict, ogImage, now = new Date() }: JsonLdI
   };
 }
 
+export interface PageJsonLdInput {
+  readonly locale: Locale;
+  /** Page path relative to the locale root, e.g. `card/`. */
+  readonly page: string;
+  readonly name: string;
+  readonly description: string;
+  readonly ogImage: string;
+  /** Label of the home crumb. */
+  readonly home: string;
+}
+
+/**
+ * Builds the graph of a secondary page: a web page inside the site, published by the
+ * organization, with a breadcrumb back to the home page.
+ */
+export function buildPageJsonLd({
+  locale,
+  page,
+  name,
+  description,
+  ogImage,
+  home,
+}: PageJsonLdInput): JsonLdNode {
+  const pageUrl = localeUrl(locale, page);
+  const orgId = absoluteUrl('#organization');
+  const siteId = absoluteUrl('#website');
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': orgId,
+        name: SITE.brand,
+        url: absoluteUrl(),
+        logo: absoluteUrl('icons/icon-512.png'),
+      },
+      { '@type': 'WebSite', '@id': siteId, url: absoluteUrl(), name: SITE.brand },
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name,
+        description,
+        inLanguage: locale,
+        isPartOf: { '@id': siteId },
+        publisher: { '@id': orgId },
+        breadcrumb: { '@id': `${pageUrl}#breadcrumb` },
+        primaryImageOfPage: { '@type': 'ImageObject', url: ogImage, width: 1200, height: 630 },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: home, item: localeUrl(locale) },
+          { '@type': 'ListItem', position: 2, name, item: pageUrl },
+        ],
+      },
+    ],
+  };
+}
+
 /** Serializes JSON-LD safely for inlining inside a `<script>` element. */
 export function serializeJsonLd(node: JsonLdNode): string {
   return JSON.stringify(node).replace(/</g, '\\u003c');

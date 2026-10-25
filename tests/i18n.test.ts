@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { LOCALES } from '../src/config/site.ts';
 import { getDictionary, isLocale } from '../src/i18n/index.ts';
+import { CARD_LIMITS, CARD_TEMPLATES } from '../src/lib/card/payload.ts';
 
 /** Structural fingerprint: keys, array lengths and value types — not the copy itself. */
 function shape(value: unknown): unknown {
@@ -37,6 +38,33 @@ describe('dictionaries', () => {
       expect(title.length).toBeLessThanOrEqual(70);
       expect(description.length).toBeGreaterThanOrEqual(120);
       expect(description.length).toBeLessThanOrEqual(170);
+    }
+  });
+});
+
+describe('card copy', () => {
+  it('offers every design in the same order as the payload templates', () => {
+    for (const locale of LOCALES) {
+      expect(getDictionary(locale).card.designs.map((design) => design.id)).toEqual([
+        ...CARD_TEMPLATES,
+      ]);
+    }
+  });
+
+  it('keeps card meta copy within search-result limits', () => {
+    for (const locale of LOCALES) {
+      const { title, description } = getDictionary(locale).card.meta;
+      expect(title.length).toBeLessThanOrEqual(70);
+      expect(description.length).toBeGreaterThanOrEqual(120);
+      expect(description.length).toBeLessThanOrEqual(170);
+    }
+  });
+
+  it('keeps default messages within the message limit', () => {
+    for (const locale of LOCALES) {
+      for (const design of getDictionary(locale).card.designs) {
+        expect(Array.from(design.message).length).toBeLessThanOrEqual(CARD_LIMITS.message);
+      }
     }
   });
 });

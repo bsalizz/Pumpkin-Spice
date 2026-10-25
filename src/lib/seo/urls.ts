@@ -5,9 +5,12 @@ export function absoluteUrl(path = ''): string {
   return new URL(path.replace(/^\/+/, ''), SITE_URL).href;
 }
 
-/** Canonical URL of a localized home page. */
-export function localeUrl(locale: Locale): string {
-  return absoluteUrl(LOCALE_PATH[locale]);
+/**
+ * Canonical URL of a localized page. `page` is relative to the locale root and ends
+ * with a slash (`card/`); empty for the home page.
+ */
+export function localeUrl(locale: Locale, page = ''): string {
+  return absoluteUrl(`${LOCALE_PATH[locale]}${page}`);
 }
 
 export interface Alternate {
@@ -15,10 +18,10 @@ export interface Alternate {
   readonly href: string;
 }
 
-/** `hreflang` alternates for every locale plus `x-default`. */
-export function alternates(): Alternate[] {
+/** `hreflang` alternates of a page for every locale plus `x-default`. */
+export function alternates(page = ''): Alternate[] {
   return [
-    ...LOCALES.map((locale) => ({ hreflang: locale, href: localeUrl(locale) })),
-    { hreflang: 'x-default', href: localeUrl(DEFAULT_LOCALE) },
+    ...LOCALES.map((locale) => ({ hreflang: locale, href: localeUrl(locale, page) })),
+    { hreflang: 'x-default', href: localeUrl(DEFAULT_LOCALE, page) },
   ];
 }

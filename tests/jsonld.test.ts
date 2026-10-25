@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { getDictionary } from '../src/i18n/index.ts';
-import { buildJsonLd, serializeJsonLd } from '../src/lib/seo/jsonld.ts';
+import { buildJsonLd, buildPageJsonLd, serializeJsonLd } from '../src/lib/seo/jsonld.ts';
 
 const now = new Date('2026-10-25T00:00:00Z');
 const ogImage = 'https://bsalizz.github.io/Pumpkin-Spice/og/og-en.jpg';
@@ -42,5 +42,32 @@ describe('buildJsonLd', () => {
 describe('serializeJsonLd', () => {
   it('escapes "<" so the payload cannot close its script element', () => {
     expect(serializeJsonLd({ text: '</script><script>' })).not.toContain('<');
+  });
+});
+
+describe('buildPageJsonLd', () => {
+  it('places a sub-page inside the site with a breadcrumb home', () => {
+    const graph = buildPageJsonLd({
+      locale: 'hu',
+      page: 'card/',
+      name: 'Kártya',
+      description: 'Leírás',
+      ogImage,
+      home: 'Vesperine',
+    })['@graph'] as Node[];
+    expect(graph.map((node) => node['@type'])).toEqual([
+      'Organization',
+      'WebSite',
+      'WebPage',
+      'BreadcrumbList',
+    ]);
+    expect(byType(graph, 'WebPage')?.['url']).toBe(
+      'https://bsalizz.github.io/Pumpkin-Spice/hu/card/',
+    );
+    const crumbs = byType(graph, 'BreadcrumbList')?.['itemListElement'] as Node[];
+    expect(crumbs.map((crumb) => crumb['item'])).toEqual([
+      'https://bsalizz.github.io/Pumpkin-Spice/hu/',
+      'https://bsalizz.github.io/Pumpkin-Spice/hu/card/',
+    ]);
   });
 });

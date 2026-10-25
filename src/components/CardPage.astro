@@ -1,0 +1,816 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage, Image } from 'astro:assets';
+
+import ritual from '../assets/images/ritual-pour.jpg';
+import ember from '../assets/images/story-ember.jpg';
+import forever from '../assets/images/story-forever.jpg';
+import frost from '../assets/images/story-frost.jpg';
+import october from '../assets/images/story-october.jpg';
+import { LOCALE_PATH, LOCALES, SITE, type Locale } from '../config/site.ts';
+import { getDictionary } from '../i18n/index.ts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CARD_LIMITS, type CardTemplate } from '../lib/card/payload.ts';
+import { absoluteUrl } from '../lib/seo/urls.ts';
+import type { CardCopy } from '../scripts/card/page.ts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = getDictionary(locale);
+const { card } = dict;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const PAGE = 'card/';
+
+const PHOTOS: Record<CardTemplate, ImageMetadata> = { october, ember, frost, forever, ritual };
+
+// Card faces are textured from mid-sized WebP renditions of the story photographs.
+const textures = Object.fromEntries(
+  await Promise.all(
+    Object.entries(PHOTOS).map(async ([id, src]) => {
+      const image = await getImage({ src, width: 1024, format: 'webp', quality: 82 });
+      return [id, image.src] as const;
+    }),
+  ),
+);
+
+const copy: CardCopy = {
+  card,
+  brand: SITE.brand,
+  product: SITE.product,
+  address: absoluteUrl()
+    .replace(/^https:\/\//, '')
+    .replace(/\/$/, ''),
+};
+const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', hu: 'Magyar' };
+---
+
+<BaseLayout
+  locale={locale}
+  dict={dict}
+  title={card.meta.title}
+  description={card.meta.description}
+  page={PAGE}
+  ogImage="og/og-card"
+  ogImageAlt={card.meta.ogImageAlt}
+  structuredData
+>
+  <div
+    class="card-page"
+    data-card-page
+    data-mode="compose"
+    data-template="october"
+    data-photos={JSON.stringify(textures)}
+  >
+    <script type="application/json" data-card-copy set:html={JSON.stringify(copy)} />
+    <header class="bar">
+      <a class="bar__brand mono" href={`${base}${LOCALE_PATH[locale]}`}>
+        {SITE.brand}
+      </a>
+      <ul class="bar__langs" aria-label={dict.a11y.language}>
+        {LOCALES.map((code) => (
+          <li>
+            <a
+              class="mono"
+              href={`${base}${LOCALE_PATH[code]}${PAGE}`}
+              hreflang={code}
+              lang={code}
+              aria-current={code === locale ? 'true' : undefined}
+              title={LANGUAGE_NAMES[code]}
+              data-card-lang
+            >
+              {code}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </header>
+
+    <main id="main" class="card-main">
+      <section class="stage" aria-label={card.stage.label}>
+        <div class="stage__frame">
+          <div class="stage__focus" data-card-focus aria-hidden="true"></div>
+          <canvas
+            class="stage__canvas"
+            data-card-canvas
+            role="img"
+            aria-label={card.stage.label}
+          ></canvas>
+          <p class="stage__loading mono" aria-hidden="true">
+            {card.stage.loading}
+          </p>
+          <p class="stage__hint mono" data-card-hint aria-hidden="true">
+            {card.stage.hint}
+          </p>
+        </div>
+
+        <article class="letter" aria-live="polite">
+          <p class="letter__headline serif-italic" data-letter-headline></p>
+          <p class="letter__greeting serif-italic" data-letter-greeting></p>
+          <p class="letter__message serif-italic" data-letter-message></p>
+          <p class="letter__closing serif-italic">
+            <span data-letter-closing></span>
+            <strong data-letter-signature></strong>
+          </p>
+        </article>
+      </section>
+
+      <div class="panel">
+        <p class="label mono">{card.label}</p>
+        <h1 class="panel__title display" data-card-title>
+          {card.title}
+        </h1>
+
+        <div class="view-actions">
+          <button class="pill pill--solid mono" type="button" data-card-toggle aria-pressed="false">
+            {card.stage.open}
+          </button>
+          <a class="pill mono" href={`${base}${LOCALE_PATH[locale]}${PAGE}`} data-card-reply>
+            {card.view.reply}
+          </a>
+          <a class="pill mono" href={`${base}${LOCALE_PATH[locale]}${PAGE}`}>
+            {card.view.own}
+          </a>
+        </div>
+
+        <div class="compose">
+          <p class="panel__lead serif-italic">{card.lead}</p>
+          <p class="panel__broken serif-italic" data-card-broken role="alert" hidden>
+            {card.view.broken}
+          </p>
+
+          <form class="form" data-card-form>
+            <fieldset class="designs">
+              <legend class="mono">{card.form.design}</legend>
+              <div class="designs__list">
+                {card.designs.map((design, index) => (
+                  <label class="design">
+                    <input
+                      class="visually-hidden"
+                      type="radio"
+                      name="template"
+                      value={design.id}
+                      checked={index === 0}
+                    />
+                    <Image
+                      class="design__photo"
+                      src={PHOTOS[design.id]}
+                      alt=""
+                      width={176}
+                      height={246}
+                      format="webp"
+                      loading="lazy"
+                    />
+                    <span class="design__name mono">{design.name}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <label class="field">
+              <span class="field__label mono">{card.form.to}</span>
+              <input
+                class="field__input"
+                name="to"
+                maxlength={CARD_LIMITS.to}
+                autocomplete="off"
+                placeholder={card.form.toPlaceholder}
+              />
+            </label>
+            <label class="field">
+              <span class="field__label mono">{card.form.message}</span>
+              <textarea
+                class="field__input field__input--area"
+                name="message"
+                maxlength={CARD_LIMITS.message}
+                rows="5"
+                placeholder={card.designs[0]?.message}
+              ></textarea>
+              <span class="field__counter mono" data-card-counter></span>
+            </label>
+            <label class="field">
+              <span class="field__label mono">{card.form.from}</span>
+              <input
+                class="field__input"
+                name="from"
+                maxlength={CARD_LIMITS.from}
+                autocomplete="name"
+                placeholder={card.form.fromPlaceholder}
+              />
+            </label>
+
+            <button class="pill pill--solid pill--wide mono" type="submit">
+              {card.form.create}
+            </button>
+            <p class="form__privacy">{card.form.privacy}</p>
+          </form>
+
+          <div class="result" data-card-result hidden>
+            <p class="result__ready serif-italic">{card.form.ready}</p>
+            <label class="field">
+              <span class="field__label mono">{card.form.link}</span>
+              <input class="field__input result__link" readonly data-card-link />
+            </label>
+            <div class="result__actions">
+              <button class="pill pill--solid mono" type="button" data-card-copy-link>
+                {card.form.copy}
+              </button>
+              <button class="pill mono" type="button" data-card-share hidden>
+                {card.form.share}
+              </button>
+              <a class="pill mono" href={`${base}${LOCALE_PATH[locale]}${PAGE}`} data-card-preview>
+                {card.form.preview}
+              </a>
+            </div>
+          </div>
+        </div>
+        <p class="visually-hidden" role="status" aria-live="polite" data-card-status></p>
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+<script>
+  import { bootCard } from '../scripts/card/page.ts';
+
+  bootCard().catch((error: unknown) => console.error('[card] failed to start', error));
+</script>
+
+<style>
+  .card-page {
+    --night: #1a0b05;
+    --glow: rgb(234 122 44 / 0.3);
+    --accent: var(--c-gold);
+    --stage-h: 52svh;
+    min-height: 100svh;
+    background:
+      radial-gradient(70% 45% at 50% 22%, var(--glow), transparent 70%),
+      radial-gradient(80% 60% at 15% 100%, rgb(194 64 31 / 0.16), transparent 70%), var(--night);
+    background-attachment: fixed;
+  }
+
+  .card-page[data-template='ember'] {
+    --night: #1c0603;
+    --glow: rgb(255 74 18 / 0.32);
+    --accent: #e6a24a;
+  }
+
+  .card-page[data-template='frost'] {
+    --night: #0a121b;
+    --glow: rgb(127 178 230 / 0.26);
+    --accent: var(--c-frost);
+  }
+
+  .card-page[data-template='forever'] {
+    --night: #170e05;
+    --glow: rgb(240 184 80 / 0.3);
+    --accent: var(--c-gold-light);
+  }
+
+  .card-page[data-template='ritual'] {
+    --night: #160a05;
+    --glow: rgb(232 116 44 / 0.28);
+  }
+
+  /* ---------- top bar ---------- */
+
+  .bar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: var(--z-chrome);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: max(0.9rem, env(safe-area-inset-top)) var(--gutter) 0.9rem;
+    background: linear-gradient(to bottom, rgb(11 7 5 / 0.6), transparent);
+  }
+
+  .bar__brand {
+    letter-spacing: 0.42em;
+  }
+
+  .bar__langs {
+    display: flex;
+    gap: 1.2rem;
+  }
+
+  .bar__langs a {
+    display: inline-block;
+    padding: 0.6rem 0.1rem;
+    opacity: 0.6;
+  }
+
+  .bar__langs a[aria-current='true'] {
+    opacity: 1;
+    color: var(--accent);
+  }
+
+  /* ---------- stage ---------- */
+
+  .stage {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 60svh;
+    background:
+      radial-gradient(70% 60% at 50% 50%, var(--glow), transparent 75%),
+      linear-gradient(to bottom, var(--night) 75%, transparent);
+  }
+
+  .stage__frame {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Where the card is framed; the canvas around it stays alive with weather. */
+  .stage__focus {
+    position: absolute;
+    inset: 4.2rem 1rem 2.6rem;
+    pointer-events: none;
+  }
+
+  .stage__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    touch-action: pan-y;
+    cursor: grab;
+    transition: opacity 1.4s var(--ease-out);
+  }
+
+  .stage__canvas:active {
+    cursor: grabbing;
+  }
+
+  .is-live .stage__canvas {
+    opacity: 1;
+  }
+
+  .stage__loading,
+  .stage__hint {
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
+    color: var(--c-cream-dim);
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.8s var(--ease-out);
+  }
+
+  .stage__loading {
+    top: 50%;
+    animation: pulse 1.6s ease-in-out infinite alternate;
+  }
+
+  .is-live .stage__loading,
+  .is-flat .stage__loading {
+    opacity: 0;
+    animation: none;
+  }
+
+  .stage__hint {
+    bottom: 0.9rem;
+    opacity: 0;
+    font-size: 0.62rem;
+  }
+
+  .is-live .stage__hint {
+    opacity: 0.8;
+  }
+
+  .is-live .stage__hint.is-gone {
+    opacity: 0;
+  }
+
+  /* The printed card as text: read by screen readers, shown when WebGL is unavailable. */
+  .letter {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .is-flat .stage {
+    height: auto;
+    position: relative;
+    padding: 6rem var(--gutter) 1rem;
+  }
+
+  .is-flat .stage__frame {
+    display: none;
+  }
+
+  .is-flat .letter {
+    position: relative;
+    width: min(100%, 26rem);
+    height: auto;
+    margin-inline: auto;
+    padding: 2.4rem 2rem;
+    overflow: visible;
+    clip-path: none;
+    display: grid;
+    gap: 1rem;
+    color: #3a1d0e;
+    background: #f3e6d0;
+    border-radius: 4px;
+    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.6);
+    font-size: 1.35rem;
+  }
+
+  .letter__headline {
+    font-size: 1.1em;
+    color: #9a6a24;
+  }
+
+  .letter__message {
+    white-space: pre-line;
+  }
+
+  .letter__closing {
+    display: grid;
+    justify-items: end;
+  }
+
+  .letter__closing strong {
+    font-weight: 500;
+    font-size: 1.3em;
+  }
+
+  /* ---------- panel ---------- */
+
+  .panel {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: 1.4rem;
+    padding: 1.6rem var(--gutter) 4rem;
+  }
+
+  .panel__title {
+    font-size: clamp(3.4rem, 2rem + 8vw, 7.5rem);
+  }
+
+  .panel__lead {
+    font-size: var(--fs-body);
+    color: var(--c-cream-dim);
+    max-width: 32ch;
+  }
+
+  .panel__broken {
+    padding: 1rem 1.2rem;
+    border-left: 2px solid var(--c-ember);
+    background: rgb(194 64 31 / 0.12);
+  }
+
+  .compose {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .view-actions {
+    display: none;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  [data-mode='view'] .compose {
+    display: none;
+  }
+
+  [data-mode='view'] .view-actions {
+    display: flex;
+  }
+
+  .form {
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .designs {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .designs legend {
+    margin-bottom: 0.9rem;
+    color: var(--c-cream-dim);
+  }
+
+  .designs__list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(5.4rem, 1fr);
+    gap: 0.7rem;
+    overflow-x: auto;
+    padding-bottom: 0.4rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .design {
+    display: grid;
+    gap: 0.5rem;
+    scroll-snap-align: start;
+    cursor: pointer;
+  }
+
+  .design__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1.4;
+    object-fit: cover;
+    border-radius: 3px;
+    outline: 1px solid var(--c-cream-faint);
+    outline-offset: 3px;
+    filter: saturate(0.75) brightness(0.8);
+    transition:
+      filter 0.5s var(--ease-out),
+      outline-color 0.5s var(--ease-out),
+      transform 0.6s var(--ease-out);
+  }
+
+  .design__name {
+    font-size: 0.62rem;
+    color: var(--c-cream-dim);
+    text-align: center;
+  }
+
+  .design:hover .design__photo {
+    filter: none;
+  }
+
+  .design:has(input:checked) .design__photo {
+    filter: none;
+    outline-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .design:has(input:checked) .design__name {
+    color: var(--accent);
+  }
+
+  .design:has(input:focus-visible) .design__photo {
+    outline: 2px solid var(--accent);
+  }
+
+  .field {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .field__label {
+    color: var(--c-cream-dim);
+  }
+
+  .field__input {
+    width: 100%;
+    padding: 0.85rem 0.2rem;
+    font: inherit;
+    font-family: var(--f-serif);
+    font-size: 1.35rem;
+    font-style: italic;
+    color: var(--c-cream);
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--c-cream-faint);
+    border-radius: 0;
+    transition: border-color 0.4s var(--ease-out);
+  }
+
+  .field__input::placeholder {
+    color: rgb(244 231 212 / 0.32);
+  }
+
+  .field__input:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  .field__input--area {
+    min-height: 8.5rem;
+    resize: vertical;
+    line-height: 1.35;
+  }
+
+  .field__counter {
+    justify-self: end;
+    font-size: 0.62rem;
+    color: var(--c-cream-dim);
+  }
+
+  .form__privacy {
+    font-size: 0.95rem;
+    color: var(--c-cream-dim);
+    max-width: 40ch;
+  }
+
+  .result {
+    display: grid;
+    gap: 1.2rem;
+    padding: 1.6rem;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: rgb(11 7 5 / 0.55);
+    animation: rise 0.8s var(--ease-out);
+  }
+
+  .result__ready {
+    font-size: var(--fs-body);
+  }
+
+  .result__link {
+    font-family: var(--f-mono);
+    font-style: normal;
+    font-size: 0.8rem;
+    text-overflow: ellipsis;
+  }
+
+  .result__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.9rem 1.5rem;
+    color: var(--c-cream);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: rgb(11 7 5 / 0.45);
+    backdrop-filter: blur(8px);
+    transition:
+      background-color 0.4s var(--ease-out),
+      color 0.4s var(--ease-out);
+  }
+
+  .pill:hover {
+    background: rgb(40 26 18 / 0.7);
+  }
+
+  .pill--solid {
+    color: var(--c-ink);
+    background: var(--accent);
+  }
+
+  .pill--solid:hover {
+    background: var(--c-cream);
+  }
+
+  .pill--wide {
+    width: 100%;
+    min-height: 3.6rem;
+  }
+
+  /* ---------- shared card view ---------- */
+
+  [data-mode='view'] .stage {
+    position: fixed;
+    inset: 0;
+    height: 100svh;
+    background: none;
+  }
+
+  [data-mode='view'] .stage__focus {
+    inset: 6.6rem 0.9rem 15rem;
+  }
+
+  [data-mode='view'] .stage__canvas {
+    touch-action: none;
+  }
+
+  [data-mode='view'] .stage__hint {
+    top: 4.6rem;
+    bottom: auto;
+  }
+
+  [data-mode='view'] .panel {
+    position: fixed;
+    inset: auto 0 0;
+    gap: 0.9rem;
+    padding: 3rem var(--gutter) max(1.4rem, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgb(11 7 5 / 0.9) 55%, transparent);
+    pointer-events: none;
+  }
+
+  [data-mode='view'] .panel > * {
+    pointer-events: auto;
+  }
+
+  [data-mode='view'] .panel .label {
+    display: none;
+  }
+
+  [data-mode='view'] .panel__title {
+    font-size: clamp(1.9rem, 1.2rem + 2.6vw, 3.2rem);
+    line-height: 1;
+  }
+
+  [data-mode='view'] .view-actions .pill {
+    min-height: 2.75rem;
+    padding: 0.6rem 1.15rem;
+    font-size: 0.66rem;
+  }
+
+  [data-mode='view'].is-flat .stage {
+    position: relative;
+    padding-top: 5rem;
+  }
+
+  [data-mode='view'].is-flat .panel {
+    position: relative;
+    background: none;
+  }
+
+  @media (width >= 900px) {
+    .card-page {
+      --panel-w: min(44vw, 38rem);
+    }
+
+    /* The stage spans the whole window behind the form; the card sits left of it. */
+    .stage {
+      position: fixed;
+      inset: 0;
+      height: 100svh;
+      background: none;
+    }
+
+    .stage__focus {
+      inset: 5.5rem calc(var(--panel-w) + 2rem) 4rem 2.5rem;
+    }
+
+    .stage__hint {
+      left: calc((100% - var(--panel-w)) / 2);
+      bottom: 1.6rem;
+    }
+
+    .panel {
+      width: var(--panel-w);
+      min-height: 100svh;
+      margin-left: auto;
+      align-content: center;
+      padding: 7rem clamp(2rem, 4vw, 4.5rem) 4rem;
+      background: linear-gradient(to right, transparent, rgb(11 7 5 / 0.74) 18%);
+    }
+
+    .designs__list {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      overflow: visible;
+    }
+
+    [data-mode='view'] .stage__focus {
+      inset: 5.5rem 2.5rem 10.5rem;
+    }
+
+    [data-mode='view'] .stage__hint {
+      top: auto;
+      bottom: 2.4rem;
+      left: auto;
+      right: clamp(2rem, 5vw, 6rem);
+      translate: none;
+    }
+
+    [data-mode='view'] .panel {
+      inset: auto auto 0 0;
+      width: auto;
+      max-width: 46rem;
+      min-height: 0;
+      margin: 0;
+      padding: 2rem clamp(2rem, 5vw, 6rem) 2.4rem;
+      background: none;
+    }
+
+    .is-flat .panel {
+      margin-inline: auto;
+    }
+  }
+
+  @keyframes pulse {
+    from {
+      opacity: 0.35;
+    }
+
+    to {
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+</style>

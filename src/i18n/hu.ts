@@ -21,6 +21,7 @@ export const hu: Dictionary = {
     elixir: 'Elixír',
     ritual: 'Rituálé',
     reserve: 'Foglalás',
+    card: 'Képeslap',
   },
   preloader: 'Töltjük az októbert',
   hero: {
@@ -151,6 +152,105 @@ export const hu: Dictionary = {
     fiction: 'Kitalált ház. Valódi október.',
     rights: 'Minden évszak fenntartva.',
     top: 'Vissza az első levélhez',
+  },
+  card: {
+    meta: {
+      title: 'Sütőtökös fűszeres képeslap — küldj októbert | Vesperine',
+      description:
+        'Küldj 3D pumpkin spice képeslapot annak, akit szeretsz: öt őszi dizájn, a saját szavaid, egyetlen privát link. Semmit nem tárolunk sehol.',
+      ogImageAlt:
+        'Aranyfóliás Vesperine képeslap nyílik a hulló őszi levelek között, benne kézzel írt üzenettel.',
+    },
+    label: 'Képeslap',
+    title: 'Küldj októbert',
+    lead: 'Válassz lapot, és írd meg a szavaidat. Magában a linkben utaznak, így semmit nem tárolunk sehol.',
+    invite: {
+      label: 'Annak, akit szeretsz',
+      title: 'Küldj októbert',
+      text: 'Aranyfóliás 3D képeslap, benne a saját szavaid, egyetlen privát linkben.',
+      cta: 'Képeslapot írok',
+    },
+    designs: [
+      {
+        id: 'october',
+        name: 'Első levél',
+        cover: 'Neked,\nezen az októberen',
+        quote: 'Van szerelem, ami úgy jön, mint az ősz: egyszerre, aranyban.',
+        message:
+          'Ma lehullott az első levél, és rád gondoltam. Tölts két csészét, és tartsd nekem a helyet az ablaknál.',
+      },
+      {
+        id: 'ember',
+        name: 'Parázs',
+        cover: 'Te gyújtottad\nmeg a tüzet',
+        quote: 'Fahéj, szegfűszeg és egy tűz, ami sosem tanult meg kialudni.',
+        message:
+          'Minden este melegebb a tűz mellett, mert ott vagy benne. Köszönöm a szikrát, és hogy maradtál.',
+      },
+      {
+        id: 'frost',
+        name: 'Fagy',
+        cover: 'Még mindig\nkét csészét töltök',
+        quote: 'Az első fagy sem írhatja át, amit az október megírt.',
+        message:
+          'Hideg az ablak, a második csésze érintetlen, mégis mindig töltök bele. Hiányzol. Gyere haza hamar.',
+      },
+      {
+        id: 'forever',
+        name: 'Örökké',
+        cover: 'Minden októberben,\nveled',
+        quote: 'Két csésze, egy asztal, harmincegy október, és még nincs vége.',
+        message:
+          'Az összes évszak közül az a kedvencem, amelyikben ott vagy. Boldog októbert, szerelmem.',
+      },
+      {
+        id: 'ritual',
+        name: 'Rituálé',
+        cover: 'Egy kis\noktóber neked',
+        quote: 'Lassú töltés, meleg csésze, egy pillanat, ami csak a tiéd.',
+        message:
+          'Egy kis rituálé egy nagy szívnek: szánj ma egy csendes pillanatot magadra. Minden meleg kortyot megérdemelsz.',
+      },
+    ],
+    form: {
+      design: 'Válassz lapot',
+      to: 'Kinek',
+      toPlaceholder: 'A neve',
+      message: 'Üzeneted',
+      from: 'Kitől',
+      fromPlaceholder: 'A te neved',
+      remaining: 'karakter maradt',
+      create: 'Link létrehozása',
+      ready: 'Kész a lapod. Küldd el a linket annak, akit szeretsz.',
+      link: 'Képeslap linkje',
+      copy: 'Link másolása',
+      copied: 'Link kimásolva',
+      share: 'Megosztás',
+      preview: 'Nézd meg az ő szemével',
+      privacy:
+        'A szavaid csak a linkben élnek: nincs fiók, nincs szerver, sehol nem marad róluk másolat.',
+    },
+    stage: {
+      label: 'Interaktív 3D képeslap. Húzd a forgatáshoz, koppints a kinyitáshoz.',
+      hint: 'Húzd a forgatáshoz · Koppints a kinyitáshoz',
+      open: 'Képeslap kinyitása',
+      close: 'Képeslap becsukása',
+      loading: 'Hajtogatjuk a lapot',
+    },
+    letter: {
+      dear: 'Kedves',
+      closing: 'Szeretettel:',
+      back: 'Szeretettel töltve',
+    },
+    view: {
+      title: 'Valaki októbert töltött neked',
+      for: 'Képeslap neki:',
+      reply: 'Válaszolok',
+      own: 'Saját lapot küldök',
+      broken:
+        'Ezt a lapot nem sikerült kinyitni. Lehet, hogy hiányos a link; kérd meg a feladót, hogy másolja ki újra.',
+      shareText: 'Töltöttem neked egy kis októbert.',
+    },
   },
   notFound: {
     title: 'Ez a levél lehullott',

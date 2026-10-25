@@ -1,3 +1,5 @@
+import type { CardTemplate } from '../lib/card/payload.ts';
+
 export interface Chapter {
   readonly numeral: string;
   readonly title: string;
@@ -28,6 +30,18 @@ export interface Faq {
   readonly answer: string;
 }
 
+export interface CardDesign {
+  readonly id: CardTemplate;
+  /** Name shown on the picker. */
+  readonly name: string;
+  /** Gold-foiled headline on the cover; `\n` breaks the line. */
+  readonly cover: string;
+  /** Printed on the inside of the cover, opposite the message. */
+  readonly quote: string;
+  /** Used when the sender leaves the message empty. */
+  readonly message: string;
+}
+
 export interface Dictionary {
   readonly meta: {
     readonly title: string;
@@ -47,6 +61,7 @@ export interface Dictionary {
     readonly elixir: string;
     readonly ritual: string;
     readonly reserve: string;
+    readonly card: string;
   };
   readonly preloader: string;
   readonly hero: {
@@ -104,6 +119,62 @@ export interface Dictionary {
     readonly fiction: string;
     readonly rights: string;
     readonly top: string;
+  };
+  readonly card: {
+    readonly meta: {
+      readonly title: string;
+      readonly description: string;
+      readonly ogImageAlt: string;
+    };
+    readonly label: string;
+    readonly title: string;
+    readonly lead: string;
+    readonly invite: {
+      readonly label: string;
+      readonly title: string;
+      readonly text: string;
+      readonly cta: string;
+    };
+    readonly designs: readonly CardDesign[];
+    readonly form: {
+      readonly design: string;
+      readonly to: string;
+      readonly toPlaceholder: string;
+      readonly message: string;
+      readonly from: string;
+      readonly fromPlaceholder: string;
+      readonly remaining: string;
+      readonly create: string;
+      readonly ready: string;
+      readonly link: string;
+      readonly copy: string;
+      readonly copied: string;
+      readonly share: string;
+      readonly preview: string;
+      readonly privacy: string;
+    };
+    readonly stage: {
+      readonly label: string;
+      readonly hint: string;
+      readonly open: string;
+      readonly close: string;
+      readonly loading: string;
+    };
+    readonly letter: {
+      /** Salutation before the recipient's name, e.g. "Dear". */
+      readonly dear: string;
+      readonly closing: string;
+      readonly back: string;
+    };
+    readonly view: {
+      readonly title: string;
+      /** Document title prefix: "A card for Anna". */
+      readonly for: string;
+      readonly reply: string;
+      readonly own: string;
+      readonly broken: string;
+      readonly shareText: string;
+    };
   };
   readonly notFound: {
     readonly title: string;
