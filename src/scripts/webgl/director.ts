@@ -13,6 +13,8 @@ export interface SceneState {
   palette: PaletteName;
   /** 0 = no ingredients, 1 = star anise and cinnamon orbiting the flacon. */
   spices: number;
+  /** 0 = no field, 1 = every heirloom pumpkin of the patch risen. */
+  patch: number;
   /** Leaf fall speed multiplier. */
   fall: number;
   /** 0 = autumn leaves, 1 = frozen leaves. */
@@ -31,6 +33,7 @@ const BASE: SceneState = {
   pumpkin: { x: 0, y: -3.6, z: -1, scale: 0, frost: 0 },
   palette: 'amber',
   spices: 0,
+  patch: 0,
   fall: 1,
   frost: 0,
   snow: 0,
@@ -49,7 +52,11 @@ const define = (patch: Partial2<SceneState>): SceneState => ({
 
 /** Keyframes addressed by the `data-scene` attribute of DOM anchors. */
 export const SCENES: Record<string, SceneState> = {
-  hero: define({ flacon: { x: 0, y: -0.05, z: 0, scale: 1.1, tilt: 0 }, spices: 1 }),
+  hero: define({
+    flacon: { x: 0, y: -0.05, z: 0, scale: 1.1, tilt: 0 },
+    spices: 1,
+    patch: 0.35,
+  }),
   manifesto: define({
     flacon: { x: 0.55, y: 0.1, z: -1.2, scale: 0.85, tilt: 0.28 },
     palette: 'dusk',
@@ -60,11 +67,13 @@ export const SCENES: Record<string, SceneState> = {
     flacon: HIDDEN_FLACON,
     pumpkin: { x: -0.35, y: -2.2, z: -1, scale: 0.55 },
     palette: 'dusk',
+    patch: 0.6,
   }),
   october: define({
     flacon: HIDDEN_FLACON,
     pumpkin: { x: 0, y: -0.62, z: 0, scale: 0.95 },
     palette: 'amber',
+    patch: 1,
     fall: 1.3,
     cameraZ: 6.6,
   }),
@@ -72,6 +81,7 @@ export const SCENES: Record<string, SceneState> = {
     flacon: HIDDEN_FLACON,
     pumpkin: { x: 0, y: -0.6, z: 0.6, scale: 1.05 },
     palette: 'ember',
+    patch: 1,
     fall: 0.9,
     glow: 1.45,
     cameraZ: 6.2,
@@ -80,6 +90,7 @@ export const SCENES: Record<string, SceneState> = {
     flacon: HIDDEN_FLACON,
     pumpkin: { x: 0, y: -0.66, z: -0.4, scale: 0.9, frost: 1 },
     palette: 'frost',
+    patch: 1,
     fall: 0.22,
     frost: 1,
     snow: 1,
@@ -90,6 +101,7 @@ export const SCENES: Record<string, SceneState> = {
     flacon: { x: 0.6, y: -0.1, z: 0.2, scale: 0.72, tilt: 0 },
     pumpkin: { x: -0.6, y: -0.45, z: 0, scale: 0.72, frost: 0.25 },
     palette: 'gold',
+    patch: 0.7,
     fall: 0.75,
     frost: 0.15,
     snow: 0.15,
@@ -99,6 +111,7 @@ export const SCENES: Record<string, SceneState> = {
     flacon: { x: 0, y: 0, z: -0.5, scale: 0.9 },
     pumpkin: { x: -1.1, y: -1.6, z: -2, scale: 0.5 },
     palette: 'gold',
+    patch: 0.5,
     fall: 0.9,
   }),
   elixir: define({
@@ -132,6 +145,7 @@ export const SCENES: Record<string, SceneState> = {
     pumpkin: { x: -0.36, y: -0.5, z: 0, scale: 0.72 },
     palette: 'amber',
     spices: 1,
+    patch: 1,
     glow: 1.2,
   }),
 };
@@ -158,6 +172,7 @@ export function blendStates(a: SceneState, b: SceneState, t: number): SceneState
     pumpkin: pick(a.pumpkin, b.pumpkin),
     palette: t < 0.5 ? a.palette : b.palette,
     spices: mix(a.spices, b.spices, t),
+    patch: mix(a.patch, b.patch, t),
     fall: mix(a.fall, b.fall, t),
     frost: mix(a.frost, b.frost, t),
     snow: mix(a.snow, b.snow, t),

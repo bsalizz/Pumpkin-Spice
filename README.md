@@ -28,7 +28,7 @@ Everything visual is generated — no stock assets:
   diffusion model (ComfyUI) and ship as responsive AVIF/WebP.
 - **WebGL (three.js)** — lathe-built crystal flacon with a custom liquid shader and
   suspended gold flakes, ribbed gold stopper, canvas-drawn label, spices orbiting the
-  flacon, a pumpkin that lerps into frost, GPU-instanced maple leaves, ember/snow particles, an fbm smoke backdrop,
+  flacon, a pumpkin that lerps into frost inside an instanced patch of heirloom varieties, GPU-instanced maple leaves, ember/snow particles, an fbm smoke backdrop,
   bloom + a chromatic/grain finishing pass. A scroll _Director_ blends scene keyframes
   anchored to `[data-scene]` elements, so the 3D choreography follows the DOM layout at
   every viewport size.

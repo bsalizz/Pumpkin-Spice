@@ -22,6 +22,7 @@ import { Backdrop } from './objects/backdrop.ts';
 import { Dust } from './objects/dust.ts';
 import { Flacon } from './objects/flacon.ts';
 import { Leaves } from './objects/leaves.ts';
+import { PumpkinPatch } from './objects/patch.ts';
 import { Pumpkin } from './objects/pumpkin.ts';
 import { Spices } from './objects/spices.ts';
 import { PostFX } from './postfx.ts';
@@ -58,6 +59,7 @@ export class Experience {
   private readonly flacon: Flacon;
   private readonly pumpkin = new Pumpkin();
   private readonly spices = new Spices();
+  private readonly patch = new PumpkinPatch();
   private readonly leaves: Leaves;
   private readonly dust: Dust;
   private readonly key = new DirectionalLight('#ffe2b8', 1.4);
@@ -69,6 +71,7 @@ export class Experience {
   private slowFrames = 0;
   private flaconSpin = 0;
   private spiceAmount = 0;
+  private patchAmount = 0;
   private readonly reducedMotion: boolean;
   private readonly onResize = (): void => this.resize();
 
@@ -103,6 +106,7 @@ export class Experience {
       this.backdrop.mesh,
       this.flacon.group,
       this.pumpkin.group,
+      this.patch.group,
       this.leaves.mesh,
       this.dust.points,
       this.key,
@@ -163,6 +167,7 @@ export class Experience {
         loadGeometries(spicesModelUrl),
       ]);
       this.pumpkin.adopt(pumpkin);
+      this.patch.adopt(pumpkin);
       this.spices.adopt(spices);
     } catch (error) {
       console.warn('3D models unavailable, keeping the procedural stand-ins.', error);
@@ -264,6 +269,8 @@ export class Experience {
     pg.rotation.x = Math.sin(time * 0.5) * 0.06 + s.y * -0.1;
     pg.visible = pg.scale.x > 0.01;
     this.pumpkin.setFrost(p.frost);
+    this.patchAmount = damp(this.patchAmount, state.patch, 1.6, delta);
+    this.patch.update(time, this.patchAmount, state.frost, this.halfWidth, this.camera.position.z);
 
     // Atmosphere.
     const u = this.backdrop.uniforms;
