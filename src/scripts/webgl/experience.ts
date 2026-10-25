@@ -27,6 +27,9 @@ const FOV = 35;
 const SLOW_FRAME = 1 / 40;
 const MIN_DPR = 0.75;
 
+/** Resolves in a fresh task, letting the browser paint and handle input in between. */
+const nextTask = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+
 const damp = (current: number, target: number, lambda: number, delta: number): number =>
   current + (target - current) * (1 - Math.exp(-lambda * delta));
 
@@ -79,9 +82,6 @@ export class Experience {
     this.renderer.toneMapping = NeutralToneMapping;
     this.renderer.toneMappingExposure = 0.9;
 
-    const pmrem = new PMREMGenerator(this.renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    pmrem.dispose();
     this.scene.environmentIntensity = 0.55;
 
     this.flacon = new Flacon();
@@ -113,10 +113,26 @@ export class Experience {
     this.director.measure();
   }
 
-  /** Compiles shaders up front so the first visible frame does not stutter. */
+  /**
+   * Prepares the GPU in separate tasks so the preloader keeps animating on slow
+   * devices, and the first visible frame does not stutter.
+   */
   async warmUp(): Promise<void> {
+    await nextTask();
+    const pmrem = new PMREMGenerator(this.renderer);
+    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+
+    await nextTask();
     this.director.measure();
-    await this.renderer.compileAsync(this.scene, this.camera);
+    // Programs are keyed by their output target (tone mapping, colour space), so compile
+    // against the composer's off-screen buffer the scene is actually rendered into.
+    this.renderer.setRenderTarget(this.postfx.sceneTarget);
+    const compiled = this.renderer.compileAsync(this.scene, this.camera);
+    this.renderer.setRenderTarget(null);
+    await compiled;
+
+    await nextTask();
     this.frame();
   }
 

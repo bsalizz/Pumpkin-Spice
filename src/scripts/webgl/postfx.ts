@@ -1,4 +1,4 @@
-import type { Camera, Scene, WebGLRenderer } from 'three';
+import type { Camera, Scene, WebGLRenderer, WebGLRenderTarget } from 'three';
 import { Vector2 } from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
@@ -63,6 +63,11 @@ export class PostFX {
     this.composer.addPass(new OutputPass());
     this.finish = new ShaderPass(FinishShader);
     this.composer.addPass(this.finish);
+  }
+
+  /** Off-screen target the scene is rendered into; shaders must be compiled against it. */
+  get sceneTarget(): WebGLRenderTarget {
+    return this.composer.readBuffer;
   }
 
   setSize(width: number, height: number, pixelRatio: number): void {
