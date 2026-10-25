@@ -13,13 +13,17 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
+import pumpkinModelUrl from '../../assets/models/pumpkin.glb?url';
+import spicesModelUrl from '../../assets/models/spices.glb?url';
 import { pointerState, scrollState } from '../state.ts';
 import { Director } from './director.ts';
+import { loadGeometries } from './models.ts';
 import { Backdrop } from './objects/backdrop.ts';
 import { Dust } from './objects/dust.ts';
 import { Flacon } from './objects/flacon.ts';
 import { Leaves } from './objects/leaves.ts';
 import { Pumpkin } from './objects/pumpkin.ts';
+import { Spices } from './objects/spices.ts';
 import { PostFX } from './postfx.ts';
 import { detectQuality, type Quality } from './quality.ts';
 
@@ -53,6 +57,7 @@ export class Experience {
   private readonly backdrop = new Backdrop();
   private readonly flacon: Flacon;
   private readonly pumpkin = new Pumpkin();
+  private readonly spices = new Spices();
   private readonly leaves: Leaves;
   private readonly dust: Dust;
   private readonly key = new DirectionalLight('#ffe2b8', 1.4);
@@ -63,6 +68,7 @@ export class Experience {
   private halfWidth = 2;
   private slowFrames = 0;
   private flaconSpin = 0;
+  private spiceAmount = 0;
   private readonly reducedMotion: boolean;
   private readonly onResize = (): void => this.resize();
 
@@ -87,6 +93,9 @@ export class Experience {
     this.flacon = new Flacon();
     this.leaves = new Leaves(this.quality.leaves);
     this.dust = new Dust(this.quality.dust, this.pixelRatio);
+
+    // Ingredients ride along with the flacon, orbiting as it turns.
+    this.flacon.group.add(this.spices.group);
 
     this.key.position.set(3, 5, 4);
     this.rim.position.set(-2.5, 1.5, -2.5);
@@ -140,6 +149,24 @@ export class Experience {
     this.timer.connect(document);
     this.timer.reset();
     this.renderer.setAnimationLoop((timestamp) => this.frame(timestamp));
+    void this.loadModels();
+  }
+
+  /**
+   * Swaps the procedural stand-ins for the Blender models once the page is alive.
+   * They share shader programs with the stand-ins, so the swap causes no compile stall.
+   */
+  private async loadModels(): Promise<void> {
+    try {
+      const [pumpkin, spices] = await Promise.all([
+        loadGeometries(pumpkinModelUrl),
+        loadGeometries(spicesModelUrl),
+      ]);
+      this.pumpkin.adopt(pumpkin);
+      this.spices.adopt(spices);
+    } catch (error) {
+      console.warn('3D models unavailable, keeping the procedural stand-ins.', error);
+    }
   }
 
   dispose(): void {
@@ -221,6 +248,8 @@ export class Experience {
     fg.position.y += Math.sin(time * 0.9) * 0.04;
     fg.visible = fg.scale.x > 0.01;
     this.flacon.update(time, state.glow);
+    this.spiceAmount = damp(this.spiceAmount, state.spices, 2.5, delta);
+    this.spices.update(time, this.spiceAmount);
 
     // Pumpkin.
     const p = state.pumpkin;

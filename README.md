@@ -17,11 +17,18 @@ a love story that ends with the first frost. Live at
 | Ritual  | Warm. Pour. Remember. — hand-drawn line art draws itself on scroll                                                                      |
 | Reserve | Rotating seal, live countdown to the 31 October release, share                                                                          |
 
-Everything visual is procedural — no 3D model files, no stock images:
+Everything visual is generated — no stock assets:
 
+- **3D models (Blender)** — the heirloom pumpkin (uneven lobes, twisted stem, curling
+  tendril) and the star anise and cinnamon quills are built by
+  [`blender/build_models.py`](blender/build_models.py) and exported as meshopt-compressed
+  glTF with per-vertex tints. They load after first paint; procedural stand-ins share their
+  shader programs, so the swap never stalls a frame.
+- **Photography** — the story, elixir and ritual photographs were generated with a
+  diffusion model (ComfyUI) and ship as responsive AVIF/WebP.
 - **WebGL (three.js)** — lathe-built crystal flacon with a custom liquid shader and
-  suspended gold flakes, ribbed gold stopper, canvas-drawn label, a ribbed pumpkin that
-  lerps into frost, GPU-instanced maple leaves, ember/snow particles, an fbm smoke backdrop,
+  suspended gold flakes, ribbed gold stopper, canvas-drawn label, spices orbiting the
+  flacon, a pumpkin that lerps into frost, GPU-instanced maple leaves, ember/snow particles, an fbm smoke backdrop,
   bloom + a chromatic/grain finishing pass. A scroll _Director_ blends scene keyframes
   anchored to `[data-scene]` elements, so the 3D choreography follows the DOM layout at
   every viewport size.
@@ -61,10 +68,20 @@ npm run verify     # format · lint · astro check · unit tests · build · SEO
 | `npm run assets:icons` | Regenerate favicons/app icons from the emblem (sharp)         |
 | `npm run assets:og`    | Re-render OG images from a running preview (Playwright)       |
 
+The 3D models are rebuilt with Blender 5.2 (headless); point `LD_LIBRARY_PATH` at Blender's
+`lib/` so the glTF exporter finds its bundled meshoptimizer:
+
+```bash
+LD_LIBRARY_PATH=<blender>/lib <blender>/blender --background --factory-startup \
+  --python blender/build_models.py -- src/assets/models --preview /tmp/models.png
+```
+
 ### Structure
 
 ```
+blender/                 code-built 3D models (glTF export)
 src/
+  assets/                generated photographs and 3D models (hashed at build)
   config/site.ts         single source of truth: origin, base path, brand, price
   i18n/                  typed dictionaries (en, hu) — structure parity is tested
   lib/seo/               URL helpers, JSON-LD builder

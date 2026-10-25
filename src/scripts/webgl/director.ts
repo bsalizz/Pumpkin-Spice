@@ -11,6 +11,8 @@ export interface SceneState {
   flacon: { x: number; y: number; z: number; scale: number; tilt: number };
   pumpkin: { x: number; y: number; z: number; scale: number; frost: number };
   palette: PaletteName;
+  /** 0 = no ingredients, 1 = star anise and cinnamon orbiting the flacon. */
+  spices: number;
   /** Leaf fall speed multiplier. */
   fall: number;
   /** 0 = autumn leaves, 1 = frozen leaves. */
@@ -28,6 +30,7 @@ const BASE: SceneState = {
   flacon: { x: 0, y: -0.05, z: 0, scale: 1, tilt: 0 },
   pumpkin: { x: 0, y: -3.6, z: -1, scale: 0, frost: 0 },
   palette: 'amber',
+  spices: 0,
   fall: 1,
   frost: 0,
   snow: 0,
@@ -46,10 +49,11 @@ const define = (patch: Partial2<SceneState>): SceneState => ({
 
 /** Keyframes addressed by the `data-scene` attribute of DOM anchors. */
 export const SCENES: Record<string, SceneState> = {
-  hero: define({ flacon: { x: 0, y: -0.05, z: 0, scale: 1.1, tilt: 0 } }),
+  hero: define({ flacon: { x: 0, y: -0.05, z: 0, scale: 1.1, tilt: 0 }, spices: 1 }),
   manifesto: define({
     flacon: { x: 0.55, y: 0.1, z: -1.2, scale: 0.85, tilt: 0.28 },
     palette: 'dusk',
+    spices: 0.5,
     glow: 0.85,
   }),
   'story-intro': define({
@@ -97,10 +101,16 @@ export const SCENES: Record<string, SceneState> = {
     palette: 'gold',
     fall: 0.9,
   }),
-  elixir: define({ flacon: { x: 0, y: -0.22, z: 0.4, scale: 0.9 }, palette: 'amber', glow: 1.3 }),
+  elixir: define({
+    flacon: { x: 0, y: -0.22, z: 0.4, scale: 0.9 },
+    palette: 'amber',
+    spices: 1,
+    glow: 1.3,
+  }),
   marquee: define({
     flacon: { x: -0.55, y: 0.1, z: -0.5, scale: 0.85, tilt: -0.3 },
     palette: 'ember',
+    spices: 0.7,
   }),
   stats: define({ flacon: { x: 0.6, y: 0.15, z: -1.4, scale: 0.75, tilt: 0.2 }, palette: 'noir' }),
   ritual: define({
@@ -110,6 +120,7 @@ export const SCENES: Record<string, SceneState> = {
   reserve: define({
     flacon: { x: 0.62, y: -0.1, z: -1.2, scale: 0.8, tilt: 0.15 },
     palette: 'gold',
+    spices: 0.6,
   }),
   faq: define({
     flacon: { x: -0.7, y: 0, z: -2.2, scale: 0.6, tilt: -0.25 },
@@ -120,6 +131,7 @@ export const SCENES: Record<string, SceneState> = {
     flacon: { x: 0.32, y: -0.1, z: 0.3, scale: 0.8 },
     pumpkin: { x: -0.36, y: -0.5, z: 0, scale: 0.72 },
     palette: 'amber',
+    spices: 1,
     glow: 1.2,
   }),
 };
@@ -145,6 +157,7 @@ export function blendStates(a: SceneState, b: SceneState, t: number): SceneState
     flacon: pick(a.flacon, b.flacon),
     pumpkin: pick(a.pumpkin, b.pumpkin),
     palette: t < 0.5 ? a.palette : b.palette,
+    spices: mix(a.spices, b.spices, t),
     fall: mix(a.fall, b.fall, t),
     frost: mix(a.frost, b.frost, t),
     snow: mix(a.snow, b.snow, t),
